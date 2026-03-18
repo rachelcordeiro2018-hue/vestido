@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Scissors, Mail, Lock, Loader2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import BrandIcon from '../components/BrandIcon';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -58,7 +59,7 @@ const Login = () => {
           <div className="text-center lg:text-left">
             <div className="flex items-center gap-3 mb-6 justify-center lg:justify-start">
               <div className="bg-indigo-600 p-2 rounded-xl ring-8 ring-indigo-50">
-                <Scissors className="text-white w-6 h-6" />
+                <BrandIcon className="text-white w-6 h-6" />
               </div>
               <h1 className="font-extrabold text-2xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></h1>
             </div>
