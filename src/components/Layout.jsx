@@ -39,7 +39,7 @@ const Layout = () => {
         <div className="bg-indigo-600 p-2 rounded-xl">
           <Scissors className="text-white w-6 h-6" />
         </div>
-        <h1 className="font-bold text-xl text-slate-900 tracking-tight">Dress<span className="text-indigo-600">Rent</span></h1>
+        <h1 className="font-bold text-xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></h1>
       </div>
 
       <nav className="flex-1 space-y-2">
@@ -88,7 +88,7 @@ const Layout = () => {
           <div className="bg-indigo-600 p-1.5 rounded-lg">
             <Scissors className="text-white w-5 h-5" />
           </div>
-          <span className="font-bold text-lg text-slate-900">DressRent</span>
+          <span className="font-bold text-lg text-slate-900">Vitrine da Moda LC</span>
         </div>
         <button 
           onClick={() => setIsMenuOpen(true)}

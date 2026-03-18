@@ -35,7 +35,7 @@ const PublicDressView = () => {
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-indigo-600 p-1.5 rounded-lg"><Scissors className="text-white w-5 h-5" /></div>
-            <span className="font-bold text-lg text-slate-900 tracking-tight">Dress<span className="text-indigo-600">Rent</span></span>
+            <span className="font-bold text-lg text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></span>
           </div>
           <button onClick={() => window.open(`https://wa.me/5538998401668?text=${encodeURIComponent(shareText)}`, '_blank')} className="btn-primary py-2 px-4 text-sm"><Share2 className="w-4 h-4" /> Compartilhar</button>
         </div>
@@ -119,7 +119,7 @@ const PublicDressView = () => {
         <div className="max-w-6xl mx-auto text-center space-y-4">
           <div className="flex items-center gap-2 justify-center mb-2">
             <div className="bg-indigo-600 p-1.5 rounded-lg"><Scissors className="text-white w-5 h-5" /></div>
-            <span className="font-bold text-lg text-slate-900 tracking-tight">DressRent</span>
+            <span className="font-bold text-lg text-slate-900 tracking-tight">Vitrine da Moda LC</span>
           </div>
           <p className="text-slate-400 text-sm">Sua loja favorita de aluguel de vestidos de festa.</p>
         </div>

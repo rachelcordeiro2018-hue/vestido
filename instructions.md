@@ -1,4 +1,4 @@
-# 🚀 DressRent - Sistema de Locação de Vestidos
+# 🚀 Vitrine da Moda LC - Sistema de Locação de Vestidos
 
 Sistema web moderno e responsivo para gestão de locações de vestidos, integrado ao Supabase.
 

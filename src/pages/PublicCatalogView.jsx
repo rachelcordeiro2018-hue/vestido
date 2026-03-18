@@ -39,7 +39,7 @@ const PublicCatalogView = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="bg-indigo-600 p-1.5 rounded-xl block"><Scissors className="text-white w-5 h-5" /></div>
-            <span className="font-bold text-xl text-slate-900 tracking-tight">Dress<span className="text-indigo-600">Rent</span></span>
+            <span className="font-bold text-xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></span>
           </div>
           <div className="flex items-center gap-3">
             <button 
@@ -151,13 +151,13 @@ const PublicCatalogView = () => {
          <div className="max-w-7xl mx-auto flex flex-col items-center space-y-8 text-center">
             <div className="flex items-center gap-2">
               <div className="bg-indigo-600 p-2 rounded-2xl"><Scissors className="text-white w-6 h-6" /></div>
-              <span className="font-bold text-2xl text-slate-900 tracking-tight leading-none italic">Dress<span className="text-indigo-600">Rent</span></span>
+              <span className="font-bold text-2xl text-slate-900 tracking-tight leading-none italic">Vitrine da Moda <span className="text-indigo-600">LC</span></span>
             </div>
             <p className="text-slate-400 max-w-md mx-auto leading-relaxed">Sua melhor opção para aluguel de vestidos de luxo. Viva seu momento especial com elegância.</p>
             <div className="flex gap-4">
                <button onClick={() => window.open('https://wa.me/5538998401668', '_blank')} className="bg-emerald-50 text-emerald-600 px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-emerald-100 transition-colors">WhatsApp <PhoneOutgoing className="w-5 h-5" /></button>
             </div>
-            <p className="text-slate-300 text-xs pt-10">© 2024 DressRent. Todos os direitos reservados.</p>
+            <p className="text-slate-300 text-xs pt-10">© 2024 Vitrine da Moda LC. Todos os direitos reservados.</p>
          </div>
       </footer>
     </div>

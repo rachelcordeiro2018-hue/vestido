@@ -60,7 +60,7 @@ const Login = () => {
               <div className="bg-indigo-600 p-2 rounded-xl ring-8 ring-indigo-50">
                 <Scissors className="text-white w-6 h-6" />
               </div>
-              <h1 className="font-extrabold text-2xl text-slate-900 tracking-tight">Dress<span className="text-indigo-600">Rent</span></h1>
+              <h1 className="font-extrabold text-2xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></h1>
             </div>
             <h3 className="text-3xl font-bold text-slate-800">Bem-vinda(o)!</h3>
             <p className="text-slate-500 mt-3 text-lg font-light">
@@ -121,7 +121,7 @@ const Login = () => {
           </form>
 
           <p className="text-center text-slate-400 text-sm font-light">
-            © 2026 DressRent System. Todos os direitos reservados.
+            © 2026 Vitrine da Moda LC System. Todos os direitos reservados.
           </p>
         </div>
       </div>
