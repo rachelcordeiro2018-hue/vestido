@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { ShoppingBag, ChevronLeft, Calendar, Share2, PhoneOutgoing, Scissors } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '../lib/utils';
+import BrandIcon from '../components/BrandIcon';
 
 const PublicDressView = () => {
   const { id } = useParams();
@@ -33,7 +34,10 @@ const PublicDressView = () => {
       {/* Header Fixo */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <img src="/logo.png" alt="Vitrine da Moda LC" className="h-10 w-auto object-contain" />
+          <div className="flex items-center gap-2">
+            <div className="bg-indigo-600 p-1.5 rounded-xl block"><BrandIcon className="text-white w-5 h-5" /></div>
+            <span className="font-bold text-lg text-slate-900 tracking-tight">Vitrine <span className="text-indigo-600">LC</span></span>
+          </div>
           <button onClick={() => window.open(`https://wa.me/5538998401668?text=${encodeURIComponent(shareText)}`, '_blank')} className="btn-primary py-2 px-4 text-sm"><Share2 className="w-4 h-4" /> Compartilhar</button>
         </div>
       </header>
@@ -44,24 +48,24 @@ const PublicDressView = () => {
           <div className="space-y-6">
             <div className="aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-slate-100 shadow-2xl relative">
               <AnimatePresence mode="wait">
-                <motion.img 
+                <motion.img
                   key={selectedImage}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  src={fotos[selectedImage]} 
-                  className="w-full h-full object-cover" 
-                  alt={vestido.nome} 
+                  src={fotos[selectedImage]}
+                  className="w-full h-full object-cover"
+                  alt={vestido.nome}
                 />
               </AnimatePresence>
             </div>
-            
+
             {fotos.length > 1 && (
               <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
                 {fotos.map((img, idx) => (
-                  <button 
-                    key={idx} 
+                  <button
+                    key={idx}
                     onClick={() => setSelectedImage(idx)}
                     className={`aspect-square rounded-2xl overflow-hidden border-2 transition-all ${selectedImage === idx ? 'border-indigo-600 ring-2 ring-indigo-50 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}`}
                   >
@@ -81,25 +85,25 @@ const PublicDressView = () => {
             </div>
 
             <div className="space-y-4">
-               <h4 className="text-lg font-bold text-slate-700 flex items-center gap-2 underline decoration-indigo-200 underline-offset-4">Descrição do Modelo</h4>
-               <p className="text-slate-500 leading-relaxed text-lg font-light">{vestido.descricao || 'Este modelo não possui descrição detalhada.'}</p>
+              <h4 className="text-lg font-bold text-slate-700 flex items-center gap-2 underline decoration-indigo-200 underline-offset-4">Descrição do Modelo</h4>
+              <p className="text-slate-500 leading-relaxed text-lg font-light">{vestido.descricao || 'Este modelo não possui descrição detalhada.'}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-6 pt-4">
-               <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100 flex flex-col items-center justify-center text-center space-y-2">
-                 <Calendar className="w-6 h-6 text-indigo-500" />
-                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Reserva Fácil</span>
-                 <p className="text-sm font-medium text-slate-700">Consulte datas</p>
-               </div>
-               <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100 flex flex-col items-center justify-center text-center space-y-2">
-                 <ShoppingBag className="w-6 h-6 text-indigo-500" />
-                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Ajustes Gratuitos</span>
-                 <p className="text-sm font-medium text-slate-700">Feitos sob medida</p>
-               </div>
+              <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100 flex flex-col items-center justify-center text-center space-y-2">
+                <Calendar className="w-6 h-6 text-indigo-500" />
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Reserva Fácil</span>
+                <p className="text-sm font-medium text-slate-700">Consulte datas</p>
+              </div>
+              <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100 flex flex-col items-center justify-center text-center space-y-2">
+                <ShoppingBag className="w-6 h-6 text-indigo-500" />
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Ajustes Gratuitos</span>
+                <p className="text-sm font-medium text-slate-700">Feitos sob medida</p>
+              </div>
             </div>
 
             <div className="pt-6">
-              <button 
+              <button
                 onClick={() => window.open(`https://wa.me/5538998401668?text=${encodeURIComponent(shareText)}`, '_blank')}
                 className="w-full btn-primary py-6 text-xl rounded-3xl shadow-2xl shadow-indigo-200"
               >
@@ -113,8 +117,11 @@ const PublicDressView = () => {
 
       {/* Rodapé Simples */}
       <footer className="bg-slate-50 py-12 px-4 mt-20">
-        <div className="max-w-6xl mx-auto text-center space-y-4">
-            <img src="/logo.png" alt="Vitrine da Moda LC" className="h-12 w-auto mx-auto object-contain" />
+        <div className="max-w-6xl mx-auto flex flex-col items-center text-center space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="bg-indigo-600 p-2 rounded-2xl block"><BrandIcon className="text-white w-6 h-6" /></div>
+            <span className="font-bold text-xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></span>
+          </div>
           <p className="text-slate-400 text-sm">Sua loja favorita de aluguel de vestidos de festa.</p>
         </div>
       </footer>
