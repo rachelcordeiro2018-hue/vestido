@@ -4,7 +4,6 @@ import { Search, ShoppingBag, Scissors, PhoneOutgoing, ExternalLink, ArrowRight,
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '../lib/utils';
 import { Link } from 'react-router-dom';
-import BrandIcon from '../components/BrandIcon';
 
 const PublicCatalogView = () => {
   const [vestidos, setVestidos] = useState([]);
@@ -38,10 +37,7 @@ const PublicCatalogView = () => {
       {/* Header Profissional */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-1.5 rounded-xl block"><BrandIcon className="text-white w-5 h-5" /></div>
-            <span className="font-bold text-xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></span>
-          </div>
+            <img src="/logo.png" alt="Vitrine da Moda LC" className="h-12 w-auto object-contain" />
           <div className="flex items-center gap-3">
             <button 
               onClick={shareCatalog}
@@ -150,10 +146,7 @@ const PublicCatalogView = () => {
       {/* Footer Público */}
       <footer className="bg-white border-t border-slate-100 py-20 px-6">
          <div className="max-w-7xl mx-auto flex flex-col items-center space-y-8 text-center">
-            <div className="flex items-center gap-2">
-              <div className="bg-indigo-600 p-2 rounded-2xl"><BrandIcon className="text-white w-6 h-6" /></div>
-              <span className="font-bold text-2xl text-slate-900 tracking-tight leading-none italic">Vitrine da Moda <span className="text-indigo-600">LC</span></span>
-            </div>
+            <img src="/logo.png" alt="Vitrine da Moda LC" className="h-16 w-auto object-contain" />
             <p className="text-slate-400 max-w-md mx-auto leading-relaxed">Sua melhor opção para aluguel de vestidos de luxo. Viva seu momento especial com elegância.</p>
             <div className="flex gap-4">
                <button onClick={() => window.open('https://wa.me/5538998401668', '_blank')} className="bg-emerald-50 text-emerald-600 px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-emerald-100 transition-colors">WhatsApp <PhoneOutgoing className="w-5 h-5" /></button>

@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabase';
 import { ShoppingBag, ChevronLeft, Calendar, Share2, PhoneOutgoing, Scissors } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '../lib/utils';
-import BrandIcon from '../components/BrandIcon';
 
 const PublicDressView = () => {
   const { id } = useParams();
@@ -34,10 +33,7 @@ const PublicDressView = () => {
       {/* Header Fixo */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-1.5 rounded-lg"><BrandIcon className="text-white w-5 h-5" /></div>
-            <span className="font-bold text-lg text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></span>
-          </div>
+          <img src="/logo.png" alt="Vitrine da Moda LC" className="h-10 w-auto object-contain" />
           <button onClick={() => window.open(`https://wa.me/5538998401668?text=${encodeURIComponent(shareText)}`, '_blank')} className="btn-primary py-2 px-4 text-sm"><Share2 className="w-4 h-4" /> Compartilhar</button>
         </div>
       </header>
@@ -118,10 +114,7 @@ const PublicDressView = () => {
       {/* Rodapé Simples */}
       <footer className="bg-slate-50 py-12 px-4 mt-20">
         <div className="max-w-6xl mx-auto text-center space-y-4">
-          <div className="flex items-center gap-2 justify-center mb-2">
-            <div className="bg-indigo-600 p-1.5 rounded-lg"><BrandIcon className="text-white w-5 h-5" /></div>
-            <span className="font-bold text-lg text-slate-900 tracking-tight">Vitrine da Moda LC</span>
-          </div>
+            <img src="/logo.png" alt="Vitrine da Moda LC" className="h-12 w-auto mx-auto object-contain" />
           <p className="text-slate-400 text-sm">Sua loja favorita de aluguel de vestidos de festa.</p>
         </div>
       </footer>

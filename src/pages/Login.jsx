@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Scissors, Mail, Lock, Loader2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
-import BrandIcon from '../components/BrandIcon';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -57,12 +56,7 @@ const Login = () => {
       <div className="flex flex-col items-center justify-center p-6 md:p-20">
         <div className="w-full max-w-md space-y-10">
           <div className="text-center lg:text-left">
-            <div className="flex items-center gap-3 mb-6 justify-center lg:justify-start">
-              <div className="bg-indigo-600 p-2 rounded-xl ring-8 ring-indigo-50">
-                <BrandIcon className="text-white w-6 h-6" />
-              </div>
-              <h1 className="font-extrabold text-2xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></h1>
-            </div>
+              <img src="/logo.png" alt="Vitrine da Moda LC" className="h-16 w-auto object-contain" />
             <h3 className="text-3xl font-bold text-slate-800">Bem-vinda(o)!</h3>
             <p className="text-slate-500 mt-3 text-lg font-light">
               Entre com suas credenciais para gerenciar <br className="hidden md:block"/> suas locações com maestria.
