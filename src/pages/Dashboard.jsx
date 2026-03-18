@@ -75,7 +75,7 @@ const Dashboard = () => {
     return locacoes.filter(loc => {
       const date = parseISO(loc.data_locacao);
       const locMonth = getMonth(date);
-      const matchesMonth = locMonth === currentMonth;
+      const matchesMonth = currentMonth === -1 || locMonth === currentMonth;
       const matchesSearch = loc.nome.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesMonth && matchesSearch;
     });
@@ -149,6 +149,7 @@ const Dashboard = () => {
             onChange={(e) => setCurrentMonth(parseInt(e.target.value))}
             className="input-field max-w-[180px] bg-white border-2 border-indigo-50"
           >
+            <option value="-1">Todos os meses</option>
             {months.map((m, i) => (
               <option key={i} value={i}>{m}</option>
             ))}
