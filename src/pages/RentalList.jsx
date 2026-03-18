@@ -12,7 +12,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isWithinInterval, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency, cn } from '../lib/utils';
@@ -74,6 +74,14 @@ const RentalList = () => {
     setDeletingId(null);
   };
 
+  const isCritical = (dateStr) => {
+    const date = parseISO(dateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const threeDaysFromNow = addDays(today, 3);
+    return isWithinInterval(date, { start: today, end: threeDaysFromNow });
+  };
+
   if (loading && locacoes.length === 0) {
     return (
       <div className="flex items-center justify-center p-20">
@@ -130,11 +138,16 @@ const RentalList = () => {
                 >
                   <td className="py-5 px-4">
                     <div className="flex items-center gap-4">
-                      <img 
-                        src={loc.foto_url || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=100&h=100&fit=crop'} 
-                        className="w-12 h-12 rounded-2xl object-cover border-2 border-white shadow-md ring-1 ring-slate-100"
-                        alt={loc.nome}
-                      />
+                      <div className="relative">
+                        <img 
+                          src={loc.foto_url || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=100&h=100&fit=crop'} 
+                          className="w-12 h-12 rounded-2xl object-cover border-2 border-white shadow-md ring-1 ring-slate-100"
+                          alt={loc.nome}
+                        />
+                        {isCritical(loc.data_locacao) && (
+                          <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full ring-2 ring-white animate-pulse" />
+                        )}
+                      </div>
                       <div>
                         <p className="font-bold text-slate-800">{loc.nome}</p>
                         <div className="flex items-center gap-1.5 text-xs text-slate-400">
@@ -146,10 +159,10 @@ const RentalList = () => {
                   </td>
                   <td className="py-5 px-4">
                     <div className="flex flex-col">
-                      <p className="text-slate-700 font-medium">
+                      <p className={cn("font-medium", isCritical(loc.data_locacao) ? "text-red-500" : "text-slate-700")}>
                         {format(parseISO(loc.data_locacao), "dd 'de' MMMM", { locale: ptBR })}
                       </p>
-                      <p className="text-xs text-slate-400 font-medium lowercase">
+                      <p className={cn("text-xs font-medium lowercase", isCritical(loc.data_locacao) ? "text-red-400" : "text-slate-400")}>
                         {format(parseISO(loc.data_locacao), "EEEE", { locale: ptBR })}
                       </p>
                     </div>
