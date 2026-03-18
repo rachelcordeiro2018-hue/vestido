@@ -37,7 +37,7 @@ const PublicDressView = () => {
             <div className="bg-indigo-600 p-1.5 rounded-lg"><Scissors className="text-white w-5 h-5" /></div>
             <span className="font-bold text-lg text-slate-900 tracking-tight">Dress<span className="text-indigo-600">Rent</span></span>
           </div>
-          <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank')} className="btn-primary py-2 px-4 text-sm"><Share2 className="w-4 h-4" /> Compartilhar</button>
+          <button onClick={() => window.open(`https://wa.me/5538998401668?text=${encodeURIComponent(shareText)}`, '_blank')} className="btn-primary py-2 px-4 text-sm"><Share2 className="w-4 h-4" /> Compartilhar</button>
         </div>
       </header>
 
@@ -103,7 +103,7 @@ const PublicDressView = () => {
 
             <div className="pt-6">
               <button 
-                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank')}
+                onClick={() => window.open(`https://wa.me/5538998401668?text=${encodeURIComponent(shareText)}`, '_blank')}
                 className="w-full btn-primary py-6 text-xl rounded-3xl shadow-2xl shadow-indigo-200"
               >
                 Tenho Interesse <PhoneOutgoing className="w-6 h-6 ml-2" />

@@ -49,7 +49,7 @@ const PublicCatalogView = () => {
               <Share2 className="w-4 h-4 sm:w-5 sm:h-5" /> <span className="hidden min-[400px]:inline">Compartilhar</span>
             </button>
             <button 
-              onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('Olá! Gostaria de conhecer seu catálogo completo de vestidos.')}`, '_blank')}
+              onClick={() => window.open(`https://wa.me/5538998401668?text=${encodeURIComponent('Olá! Gostaria de conhecer seu catálogo completo de vestidos.')}`, '_blank')}
               className="hidden sm:flex items-center gap-2 text-indigo-600 font-bold hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all"
             >
               Falar com Consultora <PhoneOutgoing className="w-5 h-5" />
@@ -155,7 +155,7 @@ const PublicCatalogView = () => {
             </div>
             <p className="text-slate-400 max-w-md mx-auto leading-relaxed">Sua melhor opção para aluguel de vestidos de luxo. Viva seu momento especial com elegância.</p>
             <div className="flex gap-4">
-               <button onClick={() => window.open('https://wa.me/', '_blank')} className="bg-emerald-50 text-emerald-600 px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-emerald-100 transition-colors">WhatsApp <PhoneOutgoing className="w-5 h-5" /></button>
+               <button onClick={() => window.open('https://wa.me/5538998401668', '_blank')} className="bg-emerald-50 text-emerald-600 px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-emerald-100 transition-colors">WhatsApp <PhoneOutgoing className="w-5 h-5" /></button>
             </div>
             <p className="text-slate-300 text-xs pt-10">© 2024 DressRent. Todos os direitos reservados.</p>
          </div>
