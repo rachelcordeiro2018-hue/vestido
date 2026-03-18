@@ -27,7 +27,8 @@ const PublicDressView = () => {
   if (!vestido) return <div className="min-h-screen flex items-center justify-center text-slate-500">Vestido não encontrado</div>;
 
   const fotos = (vestido.fotos && vestido.fotos.length > 0) ? vestido.fotos : [vestido.foto_url];
-  const shareText = `Olá! Estou interessada no seu vestido: *${vestido.nome}*\nPreço: ${formatCurrency(vestido.preco_base)}\nVi o modelo no seu catálogo online!\n\nAcesse: ${window.location.href}`;
+  const fotoCapa = fotos[0] ? fotos[0] : '';
+  const shareText = `Olá! Estou interessada no seu vestido: *${vestido.nome}* 👗\nPreço: ${formatCurrency(vestido.preco_base)}\nVi o modelo no seu catálogo.\n\n🔗 *Página do Vestido:* ${window.location.href}\n📸 *Foto do Vestido:* ${fotoCapa}`;
 
   return (
     <div className="min-h-screen bg-white">
