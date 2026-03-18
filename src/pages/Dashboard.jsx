@@ -8,7 +8,8 @@ import {
   RefreshCcw,
   ArrowRight,
   PlusCircle,
-  Trophy
+  Trophy,
+  Share2
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { 
@@ -32,6 +33,12 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(getMonth(new Date()));
   const [searchQuery] = useState('');
+
+  const shareCatalog = () => {
+    const publicUrl = `${window.location.origin}/catalogo/ver`;
+    const text = `Confira nosso catálogo completo de vestidos online! 👗✨\n\nVeja todos os modelos aqui:\n${publicUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   const months = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -146,6 +153,14 @@ const Dashboard = () => {
               <option key={i} value={i}>{m}</option>
             ))}
           </select>
+          
+          <button 
+            onClick={shareCatalog}
+            className="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-5 py-3 rounded-2xl font-bold hover:bg-emerald-100 transition-all text-sm"
+          >
+            <Share2 className="w-5 h-5" />
+            <span className="hidden sm:inline">Compartilhar Catálogo</span>
+          </button>
           
           <Link to="/nova-locacao" className="btn-primary">
             <PlusCircle className="w-5 h-5" />

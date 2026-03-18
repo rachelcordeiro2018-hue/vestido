@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Search, ShoppingBag, Scissors, PhoneOutgoing, ExternalLink, ArrowRight } from 'lucide-react';
+import { Search, ShoppingBag, Scissors, PhoneOutgoing, ExternalLink, ArrowRight, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '../lib/utils';
 import { Link } from 'react-router-dom';
@@ -24,6 +24,12 @@ const PublicCatalogView = () => {
   const filtered = vestidos.filter(v => v.nome.toLowerCase().includes(search.toLowerCase()));
   const getFotoCapa = (v) => (v.fotos && v.fotos.length > 0) ? v.fotos[0] : v.foto_url;
 
+  const shareCatalog = () => {
+    const url = window.location.href;
+    const text = `Confira esse catálogo incrível de vestidos de festa! 👗✨\n\nVeja todos os modelos aqui:\n${url}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-indigo-600"></div></div>;
 
   return (
@@ -35,12 +41,20 @@ const PublicCatalogView = () => {
             <div className="bg-indigo-600 p-1.5 rounded-xl block"><Scissors className="text-white w-5 h-5" /></div>
             <span className="font-bold text-xl text-slate-900 tracking-tight">Dress<span className="text-indigo-600">Rent</span></span>
           </div>
-          <button 
-            onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('Olá! Gostaria de conhecer seu catálogo completo de vestidos.')}`, '_blank')}
-            className="hidden sm:flex items-center gap-2 text-indigo-600 font-bold hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all"
-          >
-            Falar com Consultora <PhoneOutgoing className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={shareCatalog}
+              className="flex items-center gap-2 bg-emerald-50 text-emerald-600 font-bold hover:bg-emerald-100 px-4 py-2 rounded-xl transition-all text-sm sm:text-base"
+            >
+              <Share2 className="w-4 h-4 sm:w-5 sm:h-5" /> <span className="hidden min-[400px]:inline">Compartilhar</span>
+            </button>
+            <button 
+              onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('Olá! Gostaria de conhecer seu catálogo completo de vestidos.')}`, '_blank')}
+              className="hidden sm:flex items-center gap-2 text-indigo-600 font-bold hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all"
+            >
+              Falar com Consultora <PhoneOutgoing className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </header>
 
