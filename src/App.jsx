@@ -6,6 +6,7 @@ import RentalForm from './pages/RentalForm';
 import RentalList from './pages/RentalList';
 import DressCatalog from './pages/DressCatalog';
 import DressForm from './pages/DressForm';
+import MarketingTools from './pages/MarketingTools';
 import PublicDressView from './pages/PublicDressView';
 import PublicCatalogView from './pages/PublicCatalogView';
 import Login from './pages/Login';
@@ -54,6 +55,7 @@ function App() {
         <Route path="catalogo" element={<DressCatalog />} />
         <Route path="novo-vestido" element={<DressForm />} />
         <Route path="editar-vestido/:id" element={<DressForm />} />
+        <Route path="marketing" element={<MarketingTools />} />
       </Route>
     </Routes>
   );

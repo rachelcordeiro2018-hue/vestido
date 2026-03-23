@@ -32,6 +32,7 @@ const Layout = () => {
     { path: '/locacoes', label: 'Locações', icon: List },
     { path: '/catalogo', label: 'Catálogo', icon: ShoppingBag },
     { path: '/nova-locacao', label: 'Nova Locação', icon: PlusCircle },
+    { path: '/marketing', label: 'Marketing', icon: Scissors },
   ];
 
   const SidebarContent = () => (

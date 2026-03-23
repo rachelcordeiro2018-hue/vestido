@@ -1,0 +1,481 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  Download, 
+  Plus, 
+  Trash2, 
+  Image as ImageIcon, 
+  Tag as TagIcon, 
+  Layout, 
+  Check, 
+  AlertCircle,
+  RefreshCcw,
+  Sparkles,
+  ShoppingBag,
+  MoveVertical,
+  MoveHorizontal,
+  Maximize2,
+  Camera,
+  Type,
+  Coins,
+  Palette,
+  X,
+  Brush
+} from 'lucide-react';
+import { toPng } from 'html-to-image';
+import { supabase } from '../lib/supabase';
+import { cn } from '../lib/utils';
+
+const MarketingTools = () => {
+  // Inicializa o estado a partir do LocalStorage (se existir)
+  const [products, setProducts] = useState(() => {
+    const saved = localStorage.getItem('marketing_products');
+    return saved ? JSON.parse(saved) : [
+      { 
+        id: 1, 
+        nome: '', 
+        preco: '9,99', 
+        imagem1: '', 
+        imagem2: '', 
+        scale1: 1, x1: 0, y1: 0,
+        scale2: 1, x2: 0, y2: 0,
+        nameScale: 1, nameX: 0, nameY: 0, nameColor: '#ffffff',
+        priceScale: 1, priceX: 0, priceY: 0, priceColor: '#ffffff',
+        bgColor: '#ffffff'
+      }
+    ];
+  });
+
+  const [selectedId, setSelectedId] = useState(1);
+  const [isExporting, setIsExporting] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(false);
+  const previewRefs = useRef({});
+
+  const manualSave = () => {
+    localStorage.setItem('marketing_products', JSON.stringify(products));
+    setSaveStatus(true);
+    setTimeout(() => setSaveStatus(false), 2000);
+  };
+
+  const addProduct = () => {
+    const lastProduct = products[products.length - 1];
+    const newId = Date.now();
+    
+    setProducts([...products, { 
+      id: newId, 
+      nome: '', 
+      preco: lastProduct?.preco || '9,99', 
+      imagem1: '', 
+      imagem2: '', 
+      scale1: lastProduct?.scale1 || 1, x1: lastProduct?.x1 || 0, y1: lastProduct?.y1 || 0,
+      scale2: lastProduct?.scale2 || 1, x2: lastProduct?.x2 || 0, y2: lastProduct?.y2 || 0,
+      nameScale: lastProduct?.nameScale || 1, nameX: lastProduct?.nameX || 0, nameY: lastProduct?.nameY || 0, nameColor: lastProduct?.nameColor || '#ffffff',
+      priceScale: lastProduct?.priceScale || 1, priceX: lastProduct?.priceX || 0, priceY: lastProduct?.priceY || 0, priceColor: lastProduct?.priceColor || '#ffffff',
+      bgColor: lastProduct?.bgColor || '#ffffff'
+    }]);
+    setSelectedId(newId);
+  };
+
+  const removeProduct = (id) => {
+    if (products.length === 1) return;
+    setProducts(products.filter(p => p.id !== id));
+    if (selectedId === id) setSelectedId(products[0].id);
+  };
+
+  const updateProduct = (id, field, value) => {
+    setProducts(products.map(p => p.id === id ? { ...p, [field]: value } : p));
+  };
+
+  const loadFromCatalog = async () => {
+    const { data, error } = await supabase.from('vestidos').select('*');
+    if (data && !error) {
+      const newProducts = data.map(v => ({
+        id: v.id + Date.now(),
+        nome: v.nome,
+        preco: v.preco_base.toString(),
+        imagem1: v.foto_url,
+        imagem2: v.fotos?.[1] || '',
+        scale1: 1, x1: 0, y1: 0,
+        scale2: 1, x2: 0, y2: 0,
+        nameScale: 1, nameX: 0, nameY: 0, nameColor: '#ffffff',
+        priceScale: 1, priceX: 0, priceY: 0, priceColor: '#ffffff',
+        bgColor: '#ffffff'
+      }));
+      setProducts([...products, ...newProducts]);
+    }
+  };
+
+  const handleImageUpload = (id, field, e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateProduct(id, field, reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const downloadImageArray = async () => {
+    setIsExporting(true);
+    try {
+      for (const product of products) {
+        const ref = previewRefs.current[product.id];
+        if (ref) {
+          const dataUrl = await toPng(ref, { 
+            quality: 1,
+            canvasWidth: 1028,
+            canvasHeight: 1028,
+            width: 1028,
+            height: 1028,
+            pixelRatio: 1,
+            style: { transform: 'none', transformOrigin: 'top left', left: '0', top: '0' }
+          });
+          const link = document.createElement('a');
+          link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
+          link.href = dataUrl;
+          link.click();
+        }
+      }
+    } catch (err) {
+      console.error('Error exporting images:', err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const activeProduct = products.find(p => p.id === selectedId) || products[0];
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-8 min-h-screen animate-in fade-in duration-500 pb-20">
+      {/* Painel de Controle */}
+      <div className="w-full lg:w-2/5 space-y-6">
+        <header>
+          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight uppercase italic underline decoration-red-600 underline-offset-8">
+            Vitrine <span className="text-red-700">Studio</span>
+          </h2>
+          <p className="text-slate-500 mt-2 font-medium font-sans">Cor de fundo, escalas e tipografia personalizada.</p>
+        </header>
+
+        <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 space-y-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-black text-slate-800 flex items-center gap-2 font-sans tracking-tight uppercase italic">
+              <Sparkles className="w-5 h-5 text-amber-500" />
+              Catálogo de Artes
+            </h3>
+            <div className="flex items-center gap-2">
+              <button onClick={loadFromCatalog} className="flex items-center gap-2 px-4 py-2 bg-slate-950 text-white rounded-2xl hover:bg-slate-800 transition-colors text-xs font-bold">
+                <ShoppingBag className="w-4 h-4" /> Importar
+              </button>
+              <button onClick={addProduct} className="p-2 bg-red-50 text-red-600 rounded-2xl hover:bg-red-100 transition-colors border border-red-100 shadow-sm">
+                <Plus className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-2 custom-scrollbar p-1">
+            {products.map((p, idx) => (
+              <div 
+                key={p.id}
+                className={cn(
+                  "p-6 rounded-[2rem] border-2 transition-all cursor-pointer relative",
+                  selectedId === p.id ? "border-red-600 bg-red-50/10 shadow-lg" : "border-slate-100"
+                )}
+                onClick={() => setSelectedId(p.id)}
+              >
+                <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                  <span className="text-xs font-black text-slate-400 tracking-tighter uppercase italic underline underline-offset-4 decoration-red-600">Veste #{idx + 1}</span>
+                  <button onClick={(e) => { e.stopPropagation(); removeProduct(p.id); }} className="text-slate-300 hover:text-red-600 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex gap-4">
+                    <input type="text" placeholder="Nome" value={p.nome || ''} onChange={(e) => updateProduct(p.id, 'nome', e.target.value)} className="flex-1 px-5 py-3 border border-slate-200 rounded-[1.2rem] text-sm focus:ring-4 focus:ring-red-600/10 focus:border-red-600 outline-none transition-all shadow-sm font-bold" />
+                    <input type="text" placeholder="9,99" value={p.preco || ''} onChange={(e) => updateProduct(p.id, 'preco', e.target.value)} className="w-[120px] px-5 py-3 border border-slate-200 rounded-[1.2rem] text-sm outline-none font-black text-red-700 font-sans" />
+                  </div>
+                  
+                  {selectedId === p.id && (
+                    <div className="space-y-3">
+                      {/* Cor de Fundo do Template */}
+                      <div className="bg-slate-900 text-white p-4 rounded-2xl flex items-center justify-between shadow-lg">
+                         <div className="flex items-center gap-2 text-[10px] font-black uppercase italic tracking-widest"><Brush className="w-4 h-4 text-red-500" /> Cor de Fundo da Arte</div>
+                         <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-black">{p.bgColor || '#ffffff'}</span>
+                            <input type="color" value={p.bgColor || '#ffffff'} onChange={(e) => updateProduct(p.id, 'bgColor', e.target.value)} className="w-10 h-10 rounded-lg border-2 border-white/20 cursor-pointer overflow-hidden p-0" />
+                         </div>
+                      </div>
+
+                      {/* Ajuste de Nome */}
+                      <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 space-y-3">
+                        <div className="flex items-center justify-between">
+                           <div className="flex items-center gap-2 text-[10px] font-black uppercase text-indigo-700 italic"><Type className="w-4 h-4" /> Nome</div>
+                           <div className="flex items-center gap-2">
+                              <Palette className="w-3 h-3 text-indigo-400" />
+                              <input type="color" value={p.nameColor || '#ffffff'} onChange={(e) => updateProduct(p.id, 'nameColor', e.target.value)} className="w-6 h-6 rounded-md border-none cursor-pointer" />
+                           </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                           <div className="space-y-1">
+                              <label className="text-[8px] font-bold text-slate-400 uppercase">Tam</label>
+                              <input type="range" min="0.2" max="3" step="0.01" value={p.nameScale || 1} onChange={(e) => updateProduct(p.id, 'nameScale', parseFloat(e.target.value))} className="w-full h-1 bg-indigo-200 accent-indigo-600 appearance-none rounded-lg" />
+                           </div>
+                           <div className="space-y-1">
+                              <label className="text-[8px] font-bold text-slate-400 uppercase">X</label>
+                              <input type="range" min="-100" max="800" value={p.nameX || 0} onChange={(e) => updateProduct(p.id, 'nameX', parseInt(e.target.value))} className="w-full h-1 bg-indigo-200 accent-indigo-600 appearance-none rounded-lg" />
+                           </div>
+                           <div className="space-y-1">
+                              <label className="text-[8px] font-bold text-slate-400 uppercase">Y</label>
+                              <input type="range" min="-300" max="600" value={p.nameY || 0} onChange={(e) => updateProduct(p.id, 'nameY', parseInt(e.target.value))} className="w-full h-1 bg-indigo-200 accent-indigo-600 appearance-none rounded-lg" />
+                           </div>
+                        </div>
+                      </div>
+
+                      {/* Ajuste do Preço */}
+                      <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 space-y-3">
+                        <div className="flex items-center justify-between">
+                           <div className="flex items-center gap-2 text-[10px] font-black uppercase text-amber-700 italic"><Coins className="w-4 h-4" /> Preço</div>
+                           <div className="flex items-center gap-2">
+                              <Palette className="w-3 h-3 text-amber-400" />
+                              <input type="color" value={p.priceColor || '#ffffff'} onChange={(e) => updateProduct(p.id, 'priceColor', e.target.value)} className="w-6 h-6 rounded-md border-none cursor-pointer" />
+                           </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                           <div className="space-y-1">
+                              <label className="text-[8px] font-bold text-slate-400 uppercase">Tam</label>
+                              <input type="range" min="0.2" max="3" step="0.01" value={p.priceScale || 1} onChange={(e) => updateProduct(p.id, 'priceScale', parseFloat(e.target.value))} className="w-full h-1 bg-amber-200 accent-amber-600 appearance-none rounded-lg" />
+                           </div>
+                           <div className="space-y-1">
+                              <label className="text-[8px] font-bold text-slate-400 uppercase">X</label>
+                              <input type="range" min="-100" max="800" value={p.priceX || 0} onChange={(e) => updateProduct(p.id, 'priceX', parseInt(e.target.value))} className="w-full h-1 bg-amber-200 accent-amber-600 appearance-none rounded-lg" />
+                           </div>
+                           <div className="space-y-1">
+                              <label className="text-[8px] font-bold text-slate-400 uppercase">Y</label>
+                              <input type="range" min="-300" max="600" value={p.priceY || 0} onChange={(e) => updateProduct(p.id, 'priceY', parseInt(e.target.value))} className="w-full h-1 bg-amber-200 accent-amber-600 appearance-none rounded-lg" />
+                           </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AJUSTES DE IMAGEM */}
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 mb-1 italic">
+                      <Camera className="w-3 h-3" /> Enquadramento Principal
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[8px] font-bold text-slate-400">Zoom</label>
+                        <input type="range" min="0.5" max="3" step="0.01" value={p.scale1 || 1} onChange={(e) => updateProduct(p.id, 'scale1', parseFloat(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[8px] font-bold text-slate-400">X</label>
+                        <input type="range" min="-400" max="400" value={p.x1 || 0} onChange={(e) => updateProduct(p.id, 'x1', parseInt(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[8px] font-bold text-slate-400">Y</label>
+                        <input type="range" min="-400" max="400" value={p.y1 || 0} onChange={(e) => updateProduct(p.id, 'y1', parseInt(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {p.imagem2 && (
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 mb-1 italic">
+                        <Camera className="w-4 h-4" /> Enquadramento Secundário
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[8px] font-bold text-slate-400">Zoom</label>
+                          <input type="range" min="0.5" max="3" step="0.01" value={p.scale2 || 1} onChange={(e) => updateProduct(p.id, 'scale2', parseFloat(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[8px] font-bold text-slate-400">X</label>
+                          <input type="range" min="-400" max="400" value={p.x2 || 0} onChange={(e) => updateProduct(p.id, 'x2', parseInt(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[8px] font-bold text-slate-400">Y</label>
+                          <input type="range" min="-400" max="400" value={p.y2 || 0} onChange={(e) => updateProduct(p.id, 'y2', parseInt(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="relative border-2 border-dashed border-slate-200 rounded-[1.2rem] p-2 h-24 flex items-center justify-center bg-white group hover:border-red-600 transition-colors">
+                      {p.imagem1 ? (
+                        <>
+                          <img src={p.imagem1} className="h-full object-contain rounded-lg" />
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); updateProduct(p.id, 'imagem1', ''); }}
+                            className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700 transition-colors"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </>
+                      ) : (
+                        <label className="w-full h-full flex items-center justify-center cursor-pointer">
+                          <Plus className="text-slate-300" />
+                          <input type="file" className="hidden" onChange={(e) => handleImageUpload(p.id, 'imagem1', e)} />
+                        </label>
+                      )}
+                    </div>
+
+                    <div className="relative border-2 border-dashed border-slate-200 rounded-[1.2rem] p-2 h-24 flex items-center justify-center bg-white group hover:border-red-600 transition-colors">
+                      {p.imagem2 ? (
+                        <>
+                          <img src={p.imagem2} className="h-full object-contain rounded-lg" />
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); updateProduct(p.id, 'imagem2', ''); }}
+                            className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700 transition-colors"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </>
+                      ) : (
+                        <label className="w-full h-full flex items-center justify-center cursor-pointer">
+                          <Plus className="text-slate-300" />
+                          <input type="file" className="hidden" onChange={(e) => handleImageUpload(p.id, 'imagem2', e)} />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mt-6">
+            <button 
+              onClick={manualSave} 
+              className={cn(
+                "py-5 rounded-[2rem] font-black text-xl shadow-2xl flex items-center justify-center gap-2 transition-all uppercase tracking-tighter",
+                saveStatus ? "bg-emerald-500 text-white" : "bg-white text-slate-800 border-2 border-slate-100 hover:border-emerald-500"
+              )}
+            >
+              <Check className={cn("w-6 h-6", saveStatus ? "inline-block" : "hidden")} />
+              {saveStatus ? "Ajustes Salvos!" : "Salvar Ajustes"}
+            </button>
+            <button 
+              onClick={downloadImageArray} 
+              disabled={isExporting} 
+              className="py-5 bg-red-700 hover:bg-red-800 text-white rounded-[2rem] font-black text-xl shadow-2xl flex items-center justify-center gap-2 transition-all uppercase tracking-tighter shadow-red-200/50"
+            >
+              {isExporting ? <RefreshCcw className="animate-spin" /> : <Download />} Salvar Artes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Preview */}
+      <div className="flex-1 flex flex-col items-center">
+        <div className="sticky top-8 w-full flex flex-col items-center">
+          <div className="relative shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] overflow-hidden bg-white w-full max-w-[500px] aspect-square border border-slate-200">
+            <div className="absolute top-0 left-0 origin-top-left" style={{ transform: 'scale(calc(500 / 1028))' }}>
+              
+              <div 
+                ref={el => previewRefs.current[activeProduct.id] = el} 
+                className="w-[1028px] h-[1028px] relative overflow-hidden" 
+                style={{ width: '1028px', height: '1028px', backgroundColor: activeProduct.bgColor || '#ffffff' }}
+              >
+                <div className="absolute inset-0 flex z-10 overflow-hidden">
+                  {activeProduct.imagem1 && activeProduct.imagem2 ? (
+                    <>
+                      <div className="flex-1 h-full relative overflow-hidden">
+                        <img src={activeProduct.imagem1} className="absolute inset-0 w-full h-full object-cover" style={{ transform: `scale(${activeProduct.scale1 || 1}) translate(${activeProduct.x1 || 0}px, ${activeProduct.y1 || 0}px)` }} />
+                      </div>
+                      <div className="w-[12px] h-full bg-white z-20 shadow-[0_0_30px_rgba(0,0,0,0.3)]" />
+                      <div className="flex-1 h-full relative overflow-hidden">
+                        <img src={activeProduct.imagem2} className="absolute inset-0 w-full h-full object-cover" style={{ transform: `scale(${activeProduct.scale2 || 1}) translate(${activeProduct.x2 || 0}px, ${activeProduct.y2 || 0}px)` }} />
+                      </div>
+                    </>
+                  ) : activeProduct.imagem1 || activeProduct.imagem2 ? (
+                    <div className="w-full h-full relative overflow-hidden">
+                      <img src={activeProduct.imagem1 || activeProduct.imagem2} className="absolute inset-0 w-full h-full object-contain" style={{ transform: `scale(${activeProduct.scale1 || 1}) translate(${activeProduct.x1 || 0}px, ${activeProduct.y1 || 0}px)` }} />
+                    </div>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-200">
+                      <ImageIcon className="w-72 h-72 opacity-20" />
+                    </div>
+                  )}
+                </div>
+
+                {/* NOME DO PRODUTO (Boulder Style) */}
+                {activeProduct.nome && (
+                  <div 
+                    className="absolute z-40 flex flex-col pointer-events-none"
+                    style={{ 
+                      bottom: `${230 - (activeProduct.nameY || 0)}px`, 
+                      left: `${48 + (activeProduct.nameX || 0)}px`,
+                      transform: `scale(${activeProduct.nameScale || 1})`,
+                      transformOrigin: 'bottom left'
+                    }}
+                  >
+                    <h2 
+                      className="text-[4rem] font-black uppercase tracking-[-0.08em] font-boulder italic leading-none"
+                      style={{ 
+                        color: activeProduct.nameColor || '#ffffff',
+                        textShadow: '3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 25px rgba(0,0,0,0.6)',
+                        WebkitTextStroke: '2px white'
+                      }}
+                    >
+                      {activeProduct.nome}
+                    </h2>
+                  </div>
+                )}
+
+                {/* PREÇO DO PRODUTO (Boulder Style) */}
+                {activeProduct.preco && (
+                  <div 
+                    className="absolute z-40 flex flex-col pointer-events-none"
+                    style={{ 
+                      bottom: `${230 - (activeProduct.priceY || 0)}px`, 
+                      left: `${48 + (activeProduct.priceX || 0)}px`,
+                      transform: `scale(${activeProduct.priceScale || 1})`,
+                      transformOrigin: 'bottom left'
+                    }}
+                  >
+                    <div className="flex items-baseline gap-2">
+                        <span 
+                          className="text-[2.2rem] font-black italic shadow-black font-boulder"
+                          style={{ 
+                            color: activeProduct.priceColor || '#ffffff',
+                            textShadow: '2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 5px 5px 15px rgba(0,0,0,0.4)',
+                            WebkitTextStroke: '1px white'
+                          }}
+                        >
+                          R$
+                        </span>
+                        <span 
+                          className="text-[5.4rem] font-black italic tracking-[-0.1em] font-boulder"
+                          style={{ 
+                            color: activeProduct.priceColor || '#ffffff',
+                            textShadow: '3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 30px rgba(0,0,0,0.7)',
+                            WebkitTextStroke: '2px white'
+                          }}
+                        >
+                          {activeProduct.preco}
+                        </span>
+                      </div>
+                  </div>
+                )}
+
+                <div className="absolute bottom-0 left-0 w-full z-40">
+                  <img src="/RODAPE.png" alt="Rodapé" className="w-full h-auto" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Passion+One:wght@400;700;900&display=swap');
+        .font-impact { font-family: 'Passion One', cursive; }
+        .font-boulder { font-family: 'Archivo Black', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+      `}</style>
+    </div>
+  );
+};
+
+export default MarketingTools;
