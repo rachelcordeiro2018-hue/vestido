@@ -23,6 +23,7 @@ const RentalList = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [deletingId, setDeletingId] = useState(null);
+  const [activeTab, setActiveTab] = useState('ativas'); // 'ativas' or 'finalizadas'
   const navigate = useNavigate();
 
   const fetchData = async () => {
@@ -52,12 +53,27 @@ const RentalList = () => {
     };
   }, []);
 
-  const filteredLocacoes = useMemo(() => {
-    return locacoes.filter(loc => 
+  const { activeLocacoes, finishedLocacoes } = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const filtered = locacoes.filter(loc => 
       loc.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
       loc.celular.includes(searchQuery)
     );
+
+    const active = filtered
+      .filter(loc => parseISO(loc.data_locacao) >= today)
+      .sort((a, b) => parseISO(a.data_locacao) - parseISO(b.data_locacao)); // Mais próximas primeiro
+
+    const finished = filtered
+      .filter(loc => parseISO(loc.data_locacao) < today)
+      .sort((a, b) => parseISO(b.data_locacao) - parseISO(a.data_locacao)); // Mais recentes primeiro
+
+    return { activeLocacoes: active, finishedLocacoes: finished };
   }, [locacoes, searchQuery]);
+
+  const currentLocacoes = activeTab === 'ativas' ? activeLocacoes : finishedLocacoes;
 
   const handleDelete = async (id) => {
     if (!window.confirm('Tem certeza que deseja excluir esta locação?')) return;
@@ -94,8 +110,8 @@ const RentalList = () => {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Todas as <span className="text-indigo-600 underline decoration-indigo-200 underline-offset-8">Locações</span></h2>
-          <p className="text-slate-500 mt-2 font-light">Gerencie e visualize todo o seu histórico de aluguéis.</p>
+          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Gerenciar <span className="text-indigo-600 underline decoration-indigo-200 underline-offset-8">Locações</span></h2>
+          <p className="text-slate-500 mt-2 font-light">Controle e organize todos os seus aluguéis de vestidos.</p>
         </div>
 
         <Link to="/nova-locacao" className="btn-primary">
@@ -105,15 +121,54 @@ const RentalList = () => {
       </div>
 
       <div className="bg-white p-4 md:p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40">
-        <div className="relative mb-8">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Buscar por cliente ou telefone..."
-            className="input-field pl-12"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+        <div className="flex flex-col md:flex-row gap-6 mb-8">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Buscar por cliente ou telefone..."
+              className="input-field pl-12"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex bg-slate-50 p-1 rounded-2xl border border-slate-100">
+            <button
+              onClick={() => setActiveTab('ativas')}
+              className={cn(
+                "px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2",
+                activeTab === 'ativas' 
+                  ? "bg-white text-indigo-600 shadow-sm" 
+                  : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              Em Aberto
+              <span className={cn(
+                "px-2 py-0.5 rounded-lg text-[10px]",
+                activeTab === 'ativas' ? "bg-indigo-50 text-indigo-600" : "bg-slate-200 text-slate-500"
+              )}>
+                {activeLocacoes.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('finalizadas')}
+              className={cn(
+                "px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2",
+                activeTab === 'finalizadas' 
+                  ? "bg-white text-slate-600 shadow-sm" 
+                  : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              Finalizadas
+              <span className={cn(
+                "px-2 py-0.5 rounded-lg text-[10px]",
+                activeTab === 'finalizadas' ? "bg-slate-100 text-slate-600" : "bg-slate-200 text-slate-500"
+              )}>
+                {finishedLocacoes.length}
+              </span>
+            </button>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -128,7 +183,7 @@ const RentalList = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredLocacoes.map((loc, idx) => (
+              {currentLocacoes.map((loc, idx) => (
                 <motion.tr 
                   key={loc.id}
                   initial={{ opacity: 0, y: 10 }}
@@ -144,7 +199,7 @@ const RentalList = () => {
                           className="w-12 h-12 rounded-2xl object-cover border-2 border-white shadow-md ring-1 ring-slate-100"
                           alt={loc.nome}
                         />
-                        {isCritical(loc.data_locacao) && (
+                        {activeTab === 'ativas' && isCritical(loc.data_locacao) && (
                           <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full ring-2 ring-white animate-pulse" />
                         )}
                       </div>
@@ -159,10 +214,16 @@ const RentalList = () => {
                   </td>
                   <td className="py-5 px-4">
                     <div className="flex flex-col">
-                      <p className={cn("font-medium", isCritical(loc.data_locacao) ? "text-red-500" : "text-slate-700")}>
+                      <p className={cn(
+                        "font-medium", 
+                        activeTab === 'ativas' && isCritical(loc.data_locacao) ? "text-red-500" : "text-slate-700"
+                      )}>
                         {format(parseISO(loc.data_locacao), "dd 'de' MMMM", { locale: ptBR })}
                       </p>
-                      <p className={cn("text-xs font-medium lowercase", isCritical(loc.data_locacao) ? "text-red-400" : "text-slate-400")}>
+                      <p className={cn(
+                        "text-xs font-medium lowercase", 
+                        activeTab === 'ativas' && isCritical(loc.data_locacao) ? "text-red-400" : "text-slate-400"
+                      )}>
                         {format(parseISO(loc.data_locacao), "EEEE", { locale: ptBR })}
                       </p>
                     </div>
@@ -197,14 +258,18 @@ const RentalList = () => {
                 </motion.tr>
               ))}
 
-              {filteredLocacoes.length === 0 && (
-                <tr>
+              {currentLocacoes.length === 0 && (
+                <tr className="animate-in fade-in duration-300">
                   <td colSpan="5" className="py-20 text-center">
                     <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                       <AlertCircle className="w-8 h-8 text-slate-300" />
                     </div>
-                    <p className="text-slate-400 font-medium font-lg">Nenhuma locação encontrada</p>
-                    <p className="text-slate-300 text-sm mt-1">Tente mudar sua busca ou adicione uma nova locação.</p>
+                    <p className="text-slate-400 font-medium font-lg">
+                      {activeTab === 'ativas' ? 'Nenhuma locação em aberto' : 'Nenhuma locação finalizada'}
+                    </p>
+                    <p className="text-slate-300 text-sm mt-1">
+                      {searchQuery ? 'Tente mudar sua busca.' : 'Seus registros aparecerão aqui.'}
+                    </p>
                   </td>
                 </tr>
               )}
