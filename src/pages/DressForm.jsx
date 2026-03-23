@@ -159,9 +159,9 @@ const DressForm = () => {
 
             <div className="space-y-2">
               <label className="label-text">Preço de Aluguel</label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">R$</span>
-                <input {...register('preco_base')} type="number" step="0.01" className="input-field pl-12" placeholder="0.00" />
+              <div className="relative flex items-center">
+                <span className="absolute left-4 text-slate-400 font-bold pointer-events-none">R$</span>
+                <input {...register('preco_base')} type="number" step="0.01" className="input-field !pl-12" placeholder="0.00" />
               </div>
               {errors.preco_base && <p className="text-red-500 text-xs">{errors.preco_base.message}</p>}
             </div>

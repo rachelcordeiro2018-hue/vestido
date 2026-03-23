@@ -232,11 +232,13 @@ const RentalForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
               <label className="label-text">Cliente</label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="relative flex items-center">
+                <div className="absolute left-4 pointer-events-none">
+                  <User className="w-5 h-5 text-slate-400" />
+                </div>
                 <input
                   {...register('nome')}
-                  className="input-field pl-12"
+                  className="input-field !pl-12"
                   placeholder="Nome completo"
                 />
               </div>
@@ -245,11 +247,13 @@ const RentalForm = () => {
 
             <div className="space-y-2">
               <label className="label-text">WhatsApp / Celular</label>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="relative flex items-center">
+                <div className="absolute left-4 pointer-events-none">
+                  <Phone className="w-5 h-5 text-slate-400" />
+                </div>
                 <input
                   {...register('celular')}
-                  className="input-field pl-12"
+                  className="input-field !pl-12"
                   placeholder="(00) 00000-0000"
                 />
               </div>
@@ -258,12 +262,14 @@ const RentalForm = () => {
 
             <div className="space-y-2">
               <label className="label-text">Data da Locação</label>
-              <div className="relative">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="relative flex items-center">
+                <div className="absolute left-4 pointer-events-none">
+                  <Calendar className="w-5 h-5 text-slate-400" />
+                </div>
                 <input
                   {...register('data_locacao')}
                   type="date"
-                  className="input-field pl-12"
+                  className="input-field !pl-12"
                 />
               </div>
               {errors.data_locacao && <p className="text-red-500 text-xs mt-1 ml-1">{errors.data_locacao.message}</p>}
@@ -271,13 +277,15 @@ const RentalForm = () => {
 
             <div className="space-y-2">
               <label className="label-text">Valor da Locação</label>
-              <div className="relative">
-                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="relative flex items-center">
+                <div className="absolute left-4 pointer-events-none">
+                  <DollarSign className="w-5 h-5 text-slate-400" />
+                </div>
                 <input
                   {...register('valor')}
                   type="number"
                   step="0.01"
-                  className="input-field pl-12"
+                  className="input-field !pl-12"
                   placeholder="0,00"
                 />
               </div>
@@ -288,11 +296,13 @@ const RentalForm = () => {
           <div className="space-y-2">
             <label className="label-text">Observações</label>
             <div className="relative">
-              <FileText className="absolute left-4 top-4 w-5 h-5 text-slate-400" />
+              <div className="absolute left-4 top-4 pointer-events-none">
+                <FileText className="w-5 h-5 text-slate-400" />
+              </div>
               <textarea
                 {...register('observacoes')}
                 rows="4"
-                className="input-field pl-12 pt-3"
+                className="input-field !pl-12 pt-4"
                 placeholder="Detalhes sobre ajustes, entrega ou devolução..."
               ></textarea>
             </div>
