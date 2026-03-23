@@ -278,17 +278,17 @@ const MarketingTools = () => {
                            </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
-                           <div className="space-y-1">
+                           <div className="space-y-1 py-1">
                               <label className="text-[8px] font-bold text-slate-400 uppercase">Tam</label>
-                              <input type="range" min="0.2" max="3" step="0.01" value={p.nameScale || 1} onChange={(e) => updateProduct(p.id, 'nameScale', parseFloat(e.target.value))} className="w-full h-1 bg-indigo-200 accent-indigo-600 appearance-none rounded-lg" />
+                              <input type="range" min="0.2" max="3" step="0.01" value={p.nameScale || 1} onChange={(e) => updateProduct(p.id, 'nameScale', parseFloat(e.target.value))} className="w-full mobile-slider" />
                            </div>
-                           <div className="space-y-1">
+                           <div className="space-y-1 py-1">
                               <label className="text-[8px] font-bold text-slate-400 uppercase">X</label>
-                              <input type="range" min="-100" max="800" value={p.nameX || 0} onChange={(e) => updateProduct(p.id, 'nameX', parseInt(e.target.value))} className="w-full h-1 bg-indigo-200 accent-indigo-600 appearance-none rounded-lg" />
+                              <input type="range" min="-100" max="800" value={p.nameX || 0} onChange={(e) => updateProduct(p.id, 'nameX', parseInt(e.target.value))} className="w-full mobile-slider" />
                            </div>
-                           <div className="space-y-1">
+                           <div className="space-y-1 py-1">
                               <label className="text-[8px] font-bold text-slate-400 uppercase">Y</label>
-                              <input type="range" min="-300" max="600" value={p.nameY || 0} onChange={(e) => updateProduct(p.id, 'nameY', parseInt(e.target.value))} className="w-full h-1 bg-indigo-200 accent-indigo-600 appearance-none rounded-lg" />
+                              <input type="range" min="-300" max="600" value={p.nameY || 0} onChange={(e) => updateProduct(p.id, 'nameY', parseInt(e.target.value))} className="w-full mobile-slider" />
                            </div>
                         </div>
                       </div>
@@ -303,17 +303,17 @@ const MarketingTools = () => {
                            </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
-                           <div className="space-y-1">
+                           <div className="space-y-1 py-1">
                               <label className="text-[8px] font-bold text-slate-400 uppercase">Tam</label>
-                              <input type="range" min="0.2" max="3" step="0.01" value={p.priceScale || 1} onChange={(e) => updateProduct(p.id, 'priceScale', parseFloat(e.target.value))} className="w-full h-1 bg-amber-200 accent-amber-600 appearance-none rounded-lg" />
+                              <input type="range" min="0.2" max="3" step="0.01" value={p.priceScale || 1} onChange={(e) => updateProduct(p.id, 'priceScale', parseFloat(e.target.value))} className="w-full mobile-slider" />
                            </div>
-                           <div className="space-y-1">
+                           <div className="space-y-1 py-1">
                               <label className="text-[8px] font-bold text-slate-400 uppercase">X</label>
-                              <input type="range" min="-100" max="800" value={p.priceX || 0} onChange={(e) => updateProduct(p.id, 'priceX', parseInt(e.target.value))} className="w-full h-1 bg-amber-200 accent-amber-600 appearance-none rounded-lg" />
+                              <input type="range" min="-100" max="800" value={p.priceX || 0} onChange={(e) => updateProduct(p.id, 'priceX', parseInt(e.target.value))} className="w-full mobile-slider" />
                            </div>
-                           <div className="space-y-1">
+                           <div className="space-y-1 py-1">
                               <label className="text-[8px] font-bold text-slate-400 uppercase">Y</label>
-                              <input type="range" min="-300" max="600" value={p.priceY || 0} onChange={(e) => updateProduct(p.id, 'priceY', parseInt(e.target.value))} className="w-full h-1 bg-amber-200 accent-amber-600 appearance-none rounded-lg" />
+                              <input type="range" min="-300" max="600" value={p.priceY || 0} onChange={(e) => updateProduct(p.id, 'priceY', parseInt(e.target.value))} className="w-full mobile-slider" />
                            </div>
                         </div>
                       </div>
@@ -325,18 +325,18 @@ const MarketingTools = () => {
                     <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 mb-1 italic">
                       <Camera className="w-3 h-3" /> Enquadramento Principal
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="space-y-1">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="space-y-1 py-1">
                         <label className="text-[8px] font-bold text-slate-400">Zoom</label>
-                        <input type="range" min="0.5" max="3" step="0.01" value={p.scale1 || 1} onChange={(e) => updateProduct(p.id, 'scale1', parseFloat(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                        <input type="range" min="0.5" max="3" step="0.01" value={p.scale1 || 1} onChange={(e) => updateProduct(p.id, 'scale1', parseFloat(e.target.value))} className="w-full mobile-slider" />
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-1 py-1">
                         <label className="text-[8px] font-bold text-slate-400">X</label>
-                        <input type="range" min="-400" max="400" value={p.x1 || 0} onChange={(e) => updateProduct(p.id, 'x1', parseInt(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                        <input type="range" min="-400" max="400" value={p.x1 || 0} onChange={(e) => updateProduct(p.id, 'x1', parseInt(e.target.value))} className="w-full mobile-slider" />
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-1 py-1">
                         <label className="text-[8px] font-bold text-slate-400">Y</label>
-                        <input type="range" min="-400" max="400" value={p.y1 || 0} onChange={(e) => updateProduct(p.id, 'y1', parseInt(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                        <input type="range" min="-400" max="400" value={p.y1 || 0} onChange={(e) => updateProduct(p.id, 'y1', parseInt(e.target.value))} className="w-full mobile-slider" />
                       </div>
                     </div>
                   </div>
@@ -346,18 +346,18 @@ const MarketingTools = () => {
                       <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 mb-1 italic">
                         <Camera className="w-4 h-4" /> Enquadramento Secundário
                       </div>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="space-y-1">
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="space-y-1 py-1">
                           <label className="text-[8px] font-bold text-slate-400">Zoom</label>
-                          <input type="range" min="0.5" max="3" step="0.01" value={p.scale2 || 1} onChange={(e) => updateProduct(p.id, 'scale2', parseFloat(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                          <input type="range" min="0.5" max="3" step="0.01" value={p.scale2 || 1} onChange={(e) => updateProduct(p.id, 'scale2', parseFloat(e.target.value))} className="w-full mobile-slider" />
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 py-1">
                           <label className="text-[8px] font-bold text-slate-400">X</label>
-                          <input type="range" min="-400" max="400" value={p.x2 || 0} onChange={(e) => updateProduct(p.id, 'x2', parseInt(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                          <input type="range" min="-400" max="400" value={p.x2 || 0} onChange={(e) => updateProduct(p.id, 'x2', parseInt(e.target.value))} className="w-full mobile-slider" />
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 py-1">
                           <label className="text-[8px] font-bold text-slate-400">Y</label>
-                          <input type="range" min="-400" max="400" value={p.y2 || 0} onChange={(e) => updateProduct(p.id, 'y2', parseInt(e.target.value))} className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-red-600" />
+                          <input type="range" min="-400" max="400" value={p.y2 || 0} onChange={(e) => updateProduct(p.id, 'y2', parseInt(e.target.value))} className="w-full mobile-slider" />
                         </div>
                       </div>
                     </div>
@@ -437,6 +437,38 @@ const MarketingTools = () => {
         .font-boulder { font-family: 'Archivo Black', sans-serif; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        
+        /* Otimização de toque para Sliders Mobile */
+        .mobile-slider {
+          -webkit-appearance: none;
+          appearance: none;
+          height: 12px;
+          background: #f1f5f9;
+          border-radius: 99px;
+          margin: 8px 0;
+          cursor: pointer;
+        }
+        .mobile-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 24px;
+          height: 24px;
+          background: #dc2626;
+          border: 4px solid white;
+          border-radius: 50%;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+          cursor: grab;
+        }
+        .mobile-slider::-moz-range-thumb {
+          width: 24px;
+          height: 24px;
+          background: #dc2626;
+          border: 4px solid white;
+          border-radius: 50%;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+          cursor: grab;
+        }
+        .mobile-slider:active::-webkit-slider-thumb { cursor: grabbing; transform: scale(1.1); }
       `}</style>
     </div>
   );
