@@ -48,7 +48,19 @@ const MarketingTools = () => {
   const [selectedId, setSelectedId] = useState(1);
   const [isExporting, setIsExporting] = useState(false);
   const [saveStatus, setSaveStatus] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(500);
   const previewRefs = useRef({});
+  const containerRef = useRef(null);
+
+  // Observa o redimensionamento do container para escala perfeita
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      setContainerWidth(entries[0].contentRect.width);
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const manualSave = () => {
     localStorage.setItem('marketing_products', JSON.stringify(products));
@@ -146,10 +158,62 @@ const MarketingTools = () => {
   const activeProduct = products.find(p => p.id === selectedId) || products[0];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 min-h-screen animate-in fade-in duration-500 pb-20">
-      {/* Painel de Controle */}
-      <div className="w-full lg:w-2/5 space-y-6">
-        <header>
+    <div className="flex flex-col lg:flex-row gap-8 min-h-screen animate-in fade-in duration-500 pb-20 px-4 md:px-0">
+      {/* Preview Section - Sticky on Mobile for better UX */}
+      <div className="lg:w-3/5 order-1 lg:order-2">
+        <div className="lg:sticky lg:top-8 w-full flex flex-col items-center bg-white/80 backdrop-blur-md lg:bg-transparent p-4 lg:p-0 rounded-3xl z-50 shadow-xl lg:shadow-none mb-4 lg:mb-0 border border-slate-100 lg:border-none">
+          <div ref={containerRef} className="relative shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] overflow-hidden bg-white w-full max-w-[500px] aspect-square border border-slate-200 rounded-xl">
+            <div className="absolute top-0 left-0 origin-top-left" style={{ transform: `scale(${containerWidth / 1028})`, width: '1028px', height: '1028px' }}>
+              <div ref={el => previewRefs.current[activeProduct.id] = el} className="w-[1028px] h-[1028px] relative overflow-hidden" style={{ width: '1028px', height: '1028px', backgroundColor: activeProduct.bgColor || '#ffffff' }}>
+                <div className="absolute inset-0 flex z-10 overflow-hidden">
+                  {activeProduct.imagem1 && activeProduct.imagem2 ? (
+                    <>
+                      <div className="flex-1 h-full relative overflow-hidden">
+                        <img src={activeProduct.imagem1} className="absolute inset-0 w-full h-full object-cover" style={{ transform: `scale(${activeProduct.scale1 || 1}) translate(${activeProduct.x1 || 0}px, ${activeProduct.y1 || 0}px)` }} />
+                      </div>
+                      <div className="w-[12px] h-full bg-white z-20 shadow-[0_0_30px_rgba(0,0,0,0.3)]" />
+                      <div className="flex-1 h-full relative overflow-hidden">
+                        <img src={activeProduct.imagem2} className="absolute inset-0 w-full h-full object-cover" style={{ transform: `scale(${activeProduct.scale2 || 1}) translate(${activeProduct.x2 || 0}px, ${activeProduct.y2 || 0}px)` }} />
+                      </div>
+                    </>
+                  ) : activeProduct.imagem1 || activeProduct.imagem2 ? (
+                    <div className="w-full h-full relative overflow-hidden">
+                      <img src={activeProduct.imagem1 || activeProduct.imagem2} className="absolute inset-0 w-full h-full object-contain" style={{ transform: `scale(${activeProduct.scale1 || 1}) translate(${activeProduct.x1 || 0}px, ${activeProduct.y1 || 0}px)` }} />
+                    </div>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-200">
+                      <ImageIcon className="w-72 h-72 opacity-20" />
+                    </div>
+                  )}
+                </div>
+
+                {activeProduct.nome && (
+                  <div className="absolute z-40 flex flex-col pointer-events-none" style={{ bottom: `${230 - (activeProduct.nameY || 0)}px`, left: `${48 + (activeProduct.nameX || 0)}px`, transform: `scale(${activeProduct.nameScale || 1})`, transformOrigin: 'bottom left' }}>
+                    <h2 className="text-[4rem] font-black uppercase tracking-[-0.08em] font-boulder italic leading-none" style={{ color: activeProduct.nameColor || '#ffffff', textShadow: '3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 25px rgba(0,0,0,0.6)', WebkitTextStroke: '2px white' }}>{activeProduct.nome}</h2>
+                  </div>
+                )}
+
+                {activeProduct.preco && (
+                  <div className="absolute z-40 flex flex-col pointer-events-none" style={{ bottom: `${230 - (activeProduct.priceY || 0)}px`, left: `${48 + (activeProduct.priceX || 0)}px`, transform: `scale(${activeProduct.priceScale || 1})`, transformOrigin: 'bottom left' }}>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-[2.2rem] font-black italic shadow-black font-boulder" style={{ color: activeProduct.priceColor || '#ffffff', textShadow: '2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 5px 5px 15px rgba(0,0,0,0.4)', WebkitTextStroke: '1px white' }}>R$</span>
+                        <span className="text-[5.4rem] font-black italic tracking-[-0.1em] font-boulder" style={{ color: activeProduct.priceColor || '#ffffff', textShadow: '3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 30px rgba(0,0,0,0.7)', WebkitTextStroke: '2px white' }}>{activeProduct.preco}</span>
+                      </div>
+                  </div>
+                )}
+
+                <div className="absolute bottom-0 left-0 w-full z-40">
+                  <img src="/RODAPE.png" alt="Rodapé" className="w-full h-auto" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Control Panel Section */}
+      <div className="w-full lg:w-2/5 order-2 lg:order-1 space-y-6">
+        <header className="hidden lg:block">
           <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight uppercase italic underline decoration-red-600 underline-offset-8">
             Vitrine <span className="text-red-700">Studio</span>
           </h2>
@@ -365,107 +429,7 @@ const MarketingTools = () => {
         </div>
       </div>
 
-      {/* Preview */}
-      <div className="flex-1 flex flex-col items-center">
-        <div className="sticky top-8 w-full flex flex-col items-center">
-          <div className="relative shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] overflow-hidden bg-white w-full max-w-[500px] aspect-square border border-slate-200">
-            <div className="absolute top-0 left-0 origin-top-left" style={{ transform: 'scale(calc(500 / 1028))' }}>
-              
-              <div 
-                ref={el => previewRefs.current[activeProduct.id] = el} 
-                className="w-[1028px] h-[1028px] relative overflow-hidden" 
-                style={{ width: '1028px', height: '1028px', backgroundColor: activeProduct.bgColor || '#ffffff' }}
-              >
-                <div className="absolute inset-0 flex z-10 overflow-hidden">
-                  {activeProduct.imagem1 && activeProduct.imagem2 ? (
-                    <>
-                      <div className="flex-1 h-full relative overflow-hidden">
-                        <img src={activeProduct.imagem1} className="absolute inset-0 w-full h-full object-cover" style={{ transform: `scale(${activeProduct.scale1 || 1}) translate(${activeProduct.x1 || 0}px, ${activeProduct.y1 || 0}px)` }} />
-                      </div>
-                      <div className="w-[12px] h-full bg-white z-20 shadow-[0_0_30px_rgba(0,0,0,0.3)]" />
-                      <div className="flex-1 h-full relative overflow-hidden">
-                        <img src={activeProduct.imagem2} className="absolute inset-0 w-full h-full object-cover" style={{ transform: `scale(${activeProduct.scale2 || 1}) translate(${activeProduct.x2 || 0}px, ${activeProduct.y2 || 0}px)` }} />
-                      </div>
-                    </>
-                  ) : activeProduct.imagem1 || activeProduct.imagem2 ? (
-                    <div className="w-full h-full relative overflow-hidden">
-                      <img src={activeProduct.imagem1 || activeProduct.imagem2} className="absolute inset-0 w-full h-full object-contain" style={{ transform: `scale(${activeProduct.scale1 || 1}) translate(${activeProduct.x1 || 0}px, ${activeProduct.y1 || 0}px)` }} />
-                    </div>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-200">
-                      <ImageIcon className="w-72 h-72 opacity-20" />
-                    </div>
-                  )}
-                </div>
 
-                {/* NOME DO PRODUTO (Boulder Style) */}
-                {activeProduct.nome && (
-                  <div 
-                    className="absolute z-40 flex flex-col pointer-events-none"
-                    style={{ 
-                      bottom: `${230 - (activeProduct.nameY || 0)}px`, 
-                      left: `${48 + (activeProduct.nameX || 0)}px`,
-                      transform: `scale(${activeProduct.nameScale || 1})`,
-                      transformOrigin: 'bottom left'
-                    }}
-                  >
-                    <h2 
-                      className="text-[4rem] font-black uppercase tracking-[-0.08em] font-boulder italic leading-none"
-                      style={{ 
-                        color: activeProduct.nameColor || '#ffffff',
-                        textShadow: '3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 25px rgba(0,0,0,0.6)',
-                        WebkitTextStroke: '2px white'
-                      }}
-                    >
-                      {activeProduct.nome}
-                    </h2>
-                  </div>
-                )}
-
-                {/* PREÇO DO PRODUTO (Boulder Style) */}
-                {activeProduct.preco && (
-                  <div 
-                    className="absolute z-40 flex flex-col pointer-events-none"
-                    style={{ 
-                      bottom: `${230 - (activeProduct.priceY || 0)}px`, 
-                      left: `${48 + (activeProduct.priceX || 0)}px`,
-                      transform: `scale(${activeProduct.priceScale || 1})`,
-                      transformOrigin: 'bottom left'
-                    }}
-                  >
-                    <div className="flex items-baseline gap-2">
-                        <span 
-                          className="text-[2.2rem] font-black italic shadow-black font-boulder"
-                          style={{ 
-                            color: activeProduct.priceColor || '#ffffff',
-                            textShadow: '2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 5px 5px 15px rgba(0,0,0,0.4)',
-                            WebkitTextStroke: '1px white'
-                          }}
-                        >
-                          R$
-                        </span>
-                        <span 
-                          className="text-[5.4rem] font-black italic tracking-[-0.1em] font-boulder"
-                          style={{ 
-                            color: activeProduct.priceColor || '#ffffff',
-                            textShadow: '3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 30px rgba(0,0,0,0.7)',
-                            WebkitTextStroke: '2px white'
-                          }}
-                        >
-                          {activeProduct.preco}
-                        </span>
-                      </div>
-                  </div>
-                )}
-
-                <div className="absolute bottom-0 left-0 w-full z-40">
-                  <img src="/RODAPE.png" alt="Rodapé" className="w-full h-auto" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
       
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Passion+One:wght@400;700;900&display=swap');
