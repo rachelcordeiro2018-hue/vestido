@@ -158,11 +158,11 @@ const MarketingTools = () => {
   const activeProduct = products.find(p => p.id === selectedId) || products[0];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 min-h-screen animate-in fade-in duration-500 pb-20 px-4 md:px-0">
+    <div className="flex flex-col lg:flex-row gap-8 min-h-screen animate-in fade-in duration-500 pb-20 px-0 md:px-0">
       {/* Preview Section - Sticky on Mobile for better UX */}
-      <div className="lg:w-3/5 order-1 lg:order-2">
-        <div className="lg:sticky lg:top-8 w-full flex flex-col items-center bg-white/80 backdrop-blur-md lg:bg-transparent p-4 lg:p-0 rounded-3xl z-50 shadow-xl lg:shadow-none mb-4 lg:mb-0 border border-slate-100 lg:border-none">
-          <div ref={containerRef} className="relative shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] overflow-hidden bg-white w-full max-w-[500px] aspect-square border border-slate-200 rounded-xl">
+      <div className="lg:w-3/5 order-1 lg:order-2 sticky top-0 z-[100]">
+        <div className="w-full flex flex-col items-center bg-white/95 backdrop-blur-xl p-2 lg:p-0 lg:bg-transparent rounded-b-[2.5rem] lg:rounded-none shadow-2xl shadow-slate-200/50 lg:shadow-none mb-2 lg:mb-0 border-b border-slate-100 lg:border-none h-fit">
+          <div ref={containerRef} className="relative shadow-2xl overflow-hidden bg-white w-full max-w-[400px] lg:max-w-[500px] aspect-square border-4 border-white rounded-3xl lg:rounded-xl">
             <div className="absolute top-0 left-0 origin-top-left" style={{ transform: `scale(${containerWidth / 1028})`, width: '1028px', height: '1028px' }}>
               <div ref={el => previewRefs.current[activeProduct.id] = el} className="w-[1028px] h-[1028px] relative overflow-hidden" style={{ width: '1028px', height: '1028px', backgroundColor: activeProduct.bgColor || '#ffffff' }}>
                 <div className="absolute inset-0 flex z-10 overflow-hidden">
