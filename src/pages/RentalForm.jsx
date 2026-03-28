@@ -26,6 +26,8 @@ const rentalSchema = z.object({
   celular: z.string().min(10, 'Número de celular inválido'),
   data_locacao: z.string().min(1, 'Data da locação é obrigatória'),
   valor: z.string().min(1, 'Valor da locação é obrigatório'),
+  valor_entrada: z.string().optional(),
+  valor_segunda_parte: z.string().optional(),
   observacoes: z.string().optional(),
 });
 
@@ -45,6 +47,8 @@ const RentalForm = () => {
       celular: '',
       data_locacao: '',
       valor: '',
+      valor_entrada: '',
+      valor_segunda_parte: '',
       observacoes: '',
     }
   });
@@ -68,7 +72,9 @@ const RentalForm = () => {
           setValue('nome', data.nome);
           setValue('celular', data.celular);
           setValue('data_locacao', data.data_locacao);
-          setValue('valor', data.valor.toString());
+          setValue('valor', data.valor?.toString() || '');
+          setValue('valor_entrada', data.valor_entrada?.toString() || '');
+          setValue('valor_segunda_parte', data.valor_segunda_parte?.toString() || '');
           setValue('observacoes', data.observacoes);
           if (data.foto_url) setImagePreview(data.foto_url);
         }
@@ -120,6 +126,8 @@ const RentalForm = () => {
         celular: data.celular,
         data_locacao: data.data_locacao,
         valor: parseFloat(data.valor),
+        valor_entrada: data.valor_entrada ? parseFloat(data.valor_entrada) : null,
+        valor_segunda_parte: data.valor_segunda_parte ? parseFloat(data.valor_segunda_parte) : null,
         observacoes: data.observacoes,
         foto_url,
       };
@@ -276,7 +284,7 @@ const RentalForm = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="label-text">Valor da Locação</label>
+              <label className="label-text">Valor da Locação (Total)</label>
               <div className="relative flex items-center">
                 <div className="absolute left-4 pointer-events-none">
                   <DollarSign className="w-5 h-5 text-slate-400" />
@@ -290,6 +298,38 @@ const RentalForm = () => {
                 />
               </div>
               {errors.valor && <p className="text-red-500 text-xs mt-1 ml-1">{errors.valor.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="label-text">Valor de Entrada</label>
+              <div className="relative flex items-center">
+                <div className="absolute left-4 pointer-events-none">
+                  <DollarSign className="w-5 h-5 text-indigo-400" />
+                </div>
+                <input
+                  {...register('valor_entrada')}
+                  type="number"
+                  step="0.01"
+                  className="input-field !pl-12 border-indigo-100 focus:border-indigo-500"
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="label-text">Segunda Parte / Restante</label>
+              <div className="relative flex items-center">
+                <div className="absolute left-4 pointer-events-none">
+                  <DollarSign className="w-5 h-5 text-indigo-400" />
+                </div>
+                <input
+                  {...register('valor_segunda_parte')}
+                  type="number"
+                  step="0.01"
+                  className="input-field !pl-12 border-indigo-100 focus:border-indigo-500"
+                  placeholder="0,00"
+                />
+              </div>
             </div>
           </div>
 

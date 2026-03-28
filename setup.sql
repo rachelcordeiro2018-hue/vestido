@@ -5,6 +5,8 @@ create table public.locacoes (
   celular text not null,
   data_locacao date not null,
   valor numeric(10, 2) not null,
+  valor_entrada numeric(10, 2),
+  valor_segunda_parte numeric(10, 2),
   foto_url text,
   observacoes text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null

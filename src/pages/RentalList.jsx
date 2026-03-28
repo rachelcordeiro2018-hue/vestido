@@ -356,15 +356,32 @@ const RentalList = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/50">
-                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                        <DollarSign className="w-5 h-5 text-emerald-500" />
+                    <div className="flex flex-col gap-3 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/50">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                          <DollarSign className="w-5 h-5 text-indigo-500" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Valor Total</p>
+                          <p className="font-black text-indigo-600 text-lg">
+                            {formatCurrency(selectedRental.valor)}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Valor do Aluguel</p>
-                        <p className="font-black text-indigo-600 text-lg">
-                          {formatCurrency(selectedRental.valor)}
-                        </p>
+                      
+                      <div className="grid grid-cols-2 gap-4 mt-1 border-t border-indigo-100/30 pt-3">
+                        <div>
+                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Entrada</p>
+                          <p className="font-bold text-emerald-600">
+                            {selectedRental.valor_entrada ? formatCurrency(selectedRental.valor_entrada) : '-'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Segunda Parte</p>
+                          <p className="font-bold text-amber-600">
+                            {selectedRental.valor_segunda_parte ? formatCurrency(selectedRental.valor_segunda_parte) : '-'}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
