@@ -85,9 +85,7 @@ const Layout = () => {
       {/* Header Mobile */}
       <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <div className="bg-amber-400 p-1 rounded-lg block">
-            <BrandIcon className="w-32 h-auto" />
-          </div>
+          <span className="font-bold text-lg text-slate-800 tracking-tight">Sistema LC</span>
         </div>
         <button
           onClick={() => setIsMenuOpen(true)}
