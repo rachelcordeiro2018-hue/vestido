@@ -23,7 +23,7 @@ const PublicDressView = () => {
       });
   }, [id]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-indigo-600"></div></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-red-700"></div></div>;
   if (!vestido) return <div className="min-h-screen flex items-center justify-center text-slate-500">Vestido não encontrado</div>;
 
   const fotos = (vestido.fotos && vestido.fotos.length > 0) ? vestido.fotos : [vestido.foto_url];
@@ -35,8 +35,8 @@ const PublicDressView = () => {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-1.5 rounded-xl block"><BrandIcon className="text-white w-5 h-5" /></div>
-            <span className="font-bold text-lg text-slate-900 tracking-tight">Vitrine <span className="text-indigo-600">LC</span></span>
+            <div className="bg-red-700 p-1.5 rounded-xl block"><BrandIcon className="text-white w-5 h-5" /></div>
+            <span className="font-bold text-lg text-slate-900 tracking-tight">Vitrine <span className="text-red-700">LC</span></span>
           </div>
           <button onClick={() => window.open(`https://wa.me/5538998401668?text=${encodeURIComponent(shareText)}`, '_blank')} className="btn-primary py-2 px-4 text-sm"><Share2 className="w-4 h-4" /> Compartilhar</button>
         </div>
@@ -67,7 +67,7 @@ const PublicDressView = () => {
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
-                    className={`aspect-square rounded-2xl overflow-hidden border-2 transition-all ${selectedImage === idx ? 'border-indigo-600 ring-2 ring-indigo-50 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                    className={`aspect-square rounded-2xl overflow-hidden border-2 transition-all ${selectedImage === idx ? 'border-red-700 ring-2 ring-amber-50 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}`}
                   >
                     <img src={img} className="w-full h-full object-cover" />
                   </button>
@@ -79,24 +79,24 @@ const PublicDressView = () => {
           {/* Informações do Produto */}
           <div className="space-y-8 flex flex-col justify-center">
             <div className="space-y-4">
-              <span className="bg-indigo-50 text-indigo-700 font-bold px-4 py-1.5 rounded-full text-sm">Disponível para Locação</span>
+              <span className="bg-amber-50 text-indigo-700 font-bold px-4 py-1.5 rounded-full text-sm">Disponível para Locação</span>
               <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 tracking-tight leading-tight">{vestido.nome}</h1>
-              <p className="text-3xl font-bold text-indigo-600">{formatCurrency(vestido.preco_base)}</p>
+              <p className="text-3xl font-bold text-red-700">{formatCurrency(vestido.preco_base)}</p>
             </div>
 
             <div className="space-y-4">
-              <h4 className="text-lg font-bold text-slate-700 flex items-center gap-2 underline decoration-indigo-200 underline-offset-4">Descrição do Modelo</h4>
+              <h4 className="text-lg font-bold text-slate-700 flex items-center gap-2 underline decoration-amber-200 underline-offset-4">Descrição do Modelo</h4>
               <p className="text-slate-500 leading-relaxed text-lg font-light">{vestido.descricao || 'Este modelo não possui descrição detalhada.'}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-6 pt-4">
               <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100 flex flex-col items-center justify-center text-center space-y-2">
-                <Calendar className="w-6 h-6 text-indigo-500" />
+                <Calendar className="w-6 h-6 text-red-600" />
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Reserva Fácil</span>
                 <p className="text-sm font-medium text-slate-700">Consulte datas</p>
               </div>
               <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100 flex flex-col items-center justify-center text-center space-y-2">
-                <ShoppingBag className="w-6 h-6 text-indigo-500" />
+                <ShoppingBag className="w-6 h-6 text-red-600" />
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Ajustes Gratuitos</span>
                 <p className="text-sm font-medium text-slate-700">Feitos sob medida</p>
               </div>
@@ -105,7 +105,7 @@ const PublicDressView = () => {
             <div className="pt-6">
               <button
                 onClick={() => window.open(`https://wa.me/5538998401668?text=${encodeURIComponent(shareText)}`, '_blank')}
-                className="w-full btn-primary py-6 text-xl rounded-3xl shadow-2xl shadow-indigo-200"
+                className="w-full btn-primary py-6 text-xl rounded-3xl shadow-2xl shadow-amber-200"
               >
                 Tenho Interesse <PhoneOutgoing className="w-6 h-6 ml-2" />
               </button>
@@ -119,8 +119,8 @@ const PublicDressView = () => {
       <footer className="bg-slate-50 py-12 px-4 mt-20">
         <div className="max-w-6xl mx-auto flex flex-col items-center text-center space-y-4">
           <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-2 rounded-2xl block"><BrandIcon className="text-white w-6 h-6" /></div>
-            <span className="font-bold text-xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></span>
+            <div className="bg-red-700 p-2 rounded-2xl block"><BrandIcon className="text-white w-6 h-6" /></div>
+            <span className="font-bold text-xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-red-700">LC</span></span>
           </div>
           <p className="text-slate-400 text-sm">Sua loja favorita de aluguel de vestidos de festa.</p>
         </div>

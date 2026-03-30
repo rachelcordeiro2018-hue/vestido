@@ -152,7 +152,7 @@ const RentalForm = () => {
   };
 
   if (fetching) {
-    return <div className="p-20 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>;
+    return <div className="p-20 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-red-600" /></div>;
   }
 
   return (
@@ -162,11 +162,11 @@ const RentalForm = () => {
           onClick={() => navigate('/')}
           className="p-3 bg-white rounded-2xl hover:bg-slate-50 transition-colors shadow-lg shadow-slate-200/50 group border border-slate-100"
         >
-          <ArrowLeft className="w-5 h-5 text-slate-500 group-hover:text-indigo-600 transition-colors" />
+          <ArrowLeft className="w-5 h-5 text-slate-500 group-hover:text-red-700 transition-colors" />
         </button>
         <div>
           <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-            {id ? 'Editar' : 'Nova'} <span className="text-indigo-600">Locação</span>
+            {id ? 'Editar' : 'Nova'} <span className="text-red-700">Locação</span>
           </h2>
           <p className="text-slate-500 mt-1 font-light">Preencha os dados abaixo para agendar o aluguel.</p>
         </div>
@@ -197,13 +197,13 @@ const RentalForm = () => {
             
             <label className={cn(
               "relative flex flex-col items-center justify-center aspect-square rounded-[2rem] border-2 border-dashed transition-all cursor-pointer overflow-hidden",
-              imagePreview ? "border-transparent" : "border-slate-200 hover:border-indigo-400 bg-slate-50/50"
+              imagePreview ? "border-transparent" : "border-slate-200 hover:border-red-500 bg-slate-50/50"
             )}>
               {imagePreview ? (
                 <>
                   <img src={imagePreview} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Preview" />
-                  <div className="absolute inset-0 bg-indigo-600/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="bg-white p-3 rounded-full text-indigo-600 shadow-lg font-bold flex items-center gap-2">
+                  <div className="absolute inset-0 bg-red-700/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="bg-white p-3 rounded-full text-red-700 shadow-lg font-bold flex items-center gap-2">
                        <Upload className="w-5 h-5" />
                        Trocar
                     </div>
@@ -212,7 +212,7 @@ const RentalForm = () => {
               ) : (
                 <div className="flex flex-col items-center gap-4 text-center px-4">
                   <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md">
-                    <ImageIcon className="w-8 h-8 text-indigo-400" />
+                    <ImageIcon className="w-8 h-8 text-red-500" />
                   </div>
                   <div className="space-y-1">
                     <p className="font-bold text-slate-700">Foto do Modelo</p>
@@ -304,13 +304,13 @@ const RentalForm = () => {
               <label className="label-text">Valor de Entrada</label>
               <div className="relative flex items-center">
                 <div className="absolute left-4 pointer-events-none">
-                  <DollarSign className="w-5 h-5 text-indigo-400" />
+                  <DollarSign className="w-5 h-5 text-red-500" />
                 </div>
                 <input
                   {...register('valor_entrada')}
                   type="number"
                   step="0.01"
-                  className="input-field !pl-12 border-indigo-100 focus:border-indigo-500"
+                  className="input-field !pl-12 border-amber-100 focus:border-red-600"
                   placeholder="0,00"
                 />
               </div>
@@ -320,13 +320,13 @@ const RentalForm = () => {
               <label className="label-text">Segunda Parte / Restante</label>
               <div className="relative flex items-center">
                 <div className="absolute left-4 pointer-events-none">
-                  <DollarSign className="w-5 h-5 text-indigo-400" />
+                  <DollarSign className="w-5 h-5 text-red-500" />
                 </div>
                 <input
                   {...register('valor_segunda_parte')}
                   type="number"
                   step="0.01"
-                  className="input-field !pl-12 border-indigo-100 focus:border-indigo-500"
+                  className="input-field !pl-12 border-amber-100 focus:border-red-600"
                   placeholder="0,00"
                 />
               </div>

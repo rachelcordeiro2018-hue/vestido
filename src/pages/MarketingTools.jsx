@@ -269,11 +269,11 @@ const MarketingTools = () => {
                       </div>
 
                       {/* Ajuste de Nome */}
-                      <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 space-y-3">
+                      <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 space-y-3">
                         <div className="flex items-center justify-between">
                            <div className="flex items-center gap-2 text-[10px] font-black uppercase text-indigo-700 italic"><Type className="w-4 h-4" /> Nome</div>
                            <div className="flex items-center gap-2">
-                              <Palette className="w-3 h-3 text-indigo-400" />
+                              <Palette className="w-3 h-3 text-red-500" />
                               <input type="color" value={p.nameColor || '#ffffff'} onChange={(e) => updateProduct(p.id, 'nameColor', e.target.value)} className="w-6 h-6 rounded-md border-none cursor-pointer" />
                            </div>
                         </div>

@@ -105,7 +105,7 @@ const RentalList = () => {
   if (loading && locacoes.length === 0) {
     return (
       <div className="flex items-center justify-center p-20">
-        <RefreshCcw className="w-8 h-8 text-indigo-500 animate-spin" />
+        <RefreshCcw className="w-8 h-8 text-red-600 animate-spin" />
       </div>
     );
   }
@@ -114,7 +114,7 @@ const RentalList = () => {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Gerenciar <span className="text-indigo-600 underline decoration-indigo-200 underline-offset-8">Locações</span></h2>
+          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Gerenciar <span className="text-red-700 underline decoration-amber-200 underline-offset-8">Locações</span></h2>
           <p className="text-slate-500 mt-2 font-light">Controle e organize todos os seus aluguéis de vestidos.</p>
         </div>
 
@@ -145,14 +145,14 @@ const RentalList = () => {
               className={cn(
                 "px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2",
                 activeTab === 'ativas' 
-                  ? "bg-white text-indigo-600 shadow-sm" 
+                  ? "bg-white text-red-700 shadow-sm" 
                   : "text-slate-500 hover:text-slate-700"
               )}
             >
               Em Aberto
               <span className={cn(
                 "px-2 py-0.5 rounded-lg text-[10px]",
-                activeTab === 'ativas' ? "bg-indigo-50 text-indigo-600" : "bg-slate-200 text-slate-500"
+                activeTab === 'ativas' ? "bg-amber-50 text-red-700" : "bg-slate-200 text-slate-500"
               )}>
                 {activeLocacoes.length}
               </span>
@@ -236,7 +236,7 @@ const RentalList = () => {
                     </div>
                   </td>
                   <td className="py-5 px-4">
-                    <p className="font-bold text-indigo-600">{formatCurrency(loc.valor)}</p>
+                    <p className="font-bold text-red-700">{formatCurrency(loc.valor)}</p>
                   </td>
                   <td className="py-5 px-4 max-w-xs">
                     <p className="text-sm text-slate-500 truncate">{loc.observacoes || '-'}</p>
@@ -248,7 +248,7 @@ const RentalList = () => {
                           e.stopPropagation();
                           setSelectedRental(loc);
                         }}
-                        className="p-2.5 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                        className="p-2.5 rounded-xl text-slate-400 hover:text-red-700 hover:bg-amber-50 transition-all"
                         title="Ver Detalhes"
                       >
                         <Eye className="w-5 h-5" />
@@ -258,7 +258,7 @@ const RentalList = () => {
                           e.stopPropagation();
                           navigate(`/editar-locacao/${loc.id}`);
                         }}
-                        className="p-2.5 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                        className="p-2.5 rounded-xl text-slate-400 hover:text-red-700 hover:bg-amber-50 transition-all"
                       >
                         <Edit3 className="w-5 h-5" />
                       </button>
@@ -338,7 +338,7 @@ const RentalList = () => {
                       {selectedRental.nome}
                     </h3>
                     <div className="flex items-center gap-2 mt-2 text-slate-500 font-medium">
-                      <Phone className="w-4 h-4 text-indigo-500" />
+                      <Phone className="w-4 h-4 text-red-600" />
                       {selectedRental.celular}
                     </div>
                   </div>
@@ -346,7 +346,7 @@ const RentalList = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl">
                       <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                        <Calendar className="w-5 h-5 text-indigo-500" />
+                        <Calendar className="w-5 h-5 text-red-600" />
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Data da Locação</p>
@@ -356,20 +356,20 @@ const RentalList = () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-3 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/50">
+                    <div className="flex flex-col gap-3 bg-amber-50/50 p-4 rounded-2xl border border-amber-100/50">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                          <DollarSign className="w-5 h-5 text-indigo-500" />
+                          <DollarSign className="w-5 h-5 text-red-600" />
                         </div>
                         <div>
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Valor Total</p>
-                          <p className="font-black text-indigo-600 text-lg">
+                          <p className="font-black text-red-700 text-lg">
                             {formatCurrency(selectedRental.valor)}
                           </p>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-4 mt-1 border-t border-indigo-100/30 pt-3">
+                      <div className="grid grid-cols-2 gap-4 mt-1 border-t border-amber-100/30 pt-3">
                         <div>
                           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Entrada</p>
                           <p className="font-bold text-emerald-600">

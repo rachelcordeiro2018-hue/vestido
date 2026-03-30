@@ -38,10 +38,9 @@ const Layout = () => {
   const SidebarContent = () => (
     <>
       <div className="mb-10 px-2 flex items-center gap-2">
-        <div className="bg-indigo-600 p-1.5 rounded-xl block">
-          <BrandIcon className="text-white w-5 h-5" />
+        <div className="bg-amber-400 p-2 rounded-2xl block mx-auto lg:mx-0">
+          <BrandIcon className="w-32 h-auto md:w-40" />
         </div>
-        <span className="font-bold text-xl text-slate-900 tracking-tight">Vitrine <span className="text-indigo-600">LC</span></span>
       </div>
 
       <nav className="flex-1 space-y-2">
@@ -54,7 +53,7 @@ const Layout = () => {
               key={item.path}
               to={item.path}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                  ? 'bg-red-700 text-white shadow-lg shadow-red-200'
                   : 'text-slate-600 hover:bg-slate-50'
                 }`}
             >
@@ -86,10 +85,9 @@ const Layout = () => {
       {/* Header Mobile */}
       <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <div className="bg-indigo-600 p-1.5 rounded-xl block">
-            <BrandIcon className="text-white w-5 h-5" />
+          <div className="bg-amber-400 p-1 rounded-lg block">
+            <BrandIcon className="w-32 h-auto" />
           </div>
-          <span className="font-bold text-lg text-slate-900 tracking-tight">Vitrine <span className="text-indigo-600">LC</span></span>
         </div>
         <button
           onClick={() => setIsMenuOpen(true)}

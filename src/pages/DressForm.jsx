@@ -111,7 +111,7 @@ const DressForm = () => {
       <div className="flex items-center gap-6">
         <button onClick={() => navigate('/catalogo')} className="p-3 bg-white rounded-2xl hover:bg-slate-50 transition-all shadow-lg border border-slate-100"><ArrowLeft className="w-5 h-5" /></button>
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">{id ? 'Editar' : 'Novo'} <span className="text-indigo-600">Vestido</span></h2>
+          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">{id ? 'Editar' : 'Novo'} <span className="text-red-700">Vestido</span></h2>
           <p className="text-slate-500 mt-1 font-light">Adicione fotos e especificações técnicas.</p>
         </div>
       </div>
@@ -141,9 +141,9 @@ const DressForm = () => {
               ))}
             </AnimatePresence>
             
-            <label className="aspect-square rounded-2xl border-2 border-dashed border-slate-200 hover:border-indigo-400 bg-slate-50 flex flex-col items-center justify-center cursor-pointer transition-colors group">
-              <Upload className="w-6 h-6 text-slate-400 group-hover:text-indigo-400 mb-2" />
-              <span className="text-xs font-bold text-slate-400 group-hover:text-indigo-600">Adicionar</span>
+            <label className="aspect-square rounded-2xl border-2 border-dashed border-slate-200 hover:border-red-500 bg-slate-50 flex flex-col items-center justify-center cursor-pointer transition-colors group">
+              <Upload className="w-6 h-6 text-slate-400 group-hover:text-red-500 mb-2" />
+              <span className="text-xs font-bold text-slate-400 group-hover:text-red-700">Adicionar</span>
               <input type="file" multiple className="hidden" accept="image/*" onChange={handleFileChange} />
             </label>
           </div>
@@ -173,7 +173,7 @@ const DressForm = () => {
           </div>
 
           <div className="md:col-span-2 pt-4">
-             <button type="submit" disabled={loading} className="btn-primary w-full py-5 text-lg shadow-2xl shadow-indigo-200">
+             <button type="submit" disabled={loading} className="btn-primary w-full py-5 text-lg shadow-2xl shadow-amber-200">
                {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <><Save className="w-5 h-5 flex items-center justify-center" /> Salvar Vestido</>}
             </button>
           </div>

@@ -31,7 +31,7 @@ const PublicCatalogView = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-indigo-600"></div></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-red-700"></div></div>;
 
   return (
     <div className="min-h-screen bg-slate-50/50">
@@ -39,8 +39,8 @@ const PublicCatalogView = () => {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-1.5 rounded-xl block"><BrandIcon className="text-white w-5 h-5" /></div>
-            <span className="font-bold text-xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-indigo-600">LC</span></span>
+            <div className="bg-red-700 p-1.5 rounded-xl block"><BrandIcon className="text-white w-5 h-5" /></div>
+            <span className="font-bold text-xl text-slate-900 tracking-tight">Vitrine da Moda <span className="text-red-700">LC</span></span>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -51,7 +51,7 @@ const PublicCatalogView = () => {
             </button>
             <button
               onClick={() => window.open(`https://wa.me/5538998401668?text=${encodeURIComponent('Olá! Gostaria de conhecer seu catálogo completo de vestidos.')}`, '_blank')}
-              className="hidden sm:flex items-center gap-2 text-indigo-600 font-bold hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all"
+              className="hidden sm:flex items-center gap-2 text-red-700 font-bold hover:bg-amber-50 px-4 py-2 rounded-xl transition-all"
             >
               Falar com Consultora <PhoneOutgoing className="w-5 h-5" />
             </button>
@@ -65,7 +65,7 @@ const PublicCatalogView = () => {
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-block text-indigo-600 font-bold tracking-[0.2em] uppercase text-sm bg-indigo-50 px-6 py-2 rounded-full"
+            className="inline-block text-red-700 font-bold tracking-[0.2em] uppercase text-sm bg-amber-50 px-6 py-2 rounded-full"
           >
             Coleção 2024/2025
           </motion.span>
@@ -75,7 +75,7 @@ const PublicCatalogView = () => {
             transition={{ delay: 0.1 }}
             className="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight leading-tight"
           >
-            Encontre o Vestido dos Seus <span className="text-indigo-600 underline decoration-indigo-200 underline-offset-8">Sonhos</span>.
+            Encontre o Vestido dos Seus <span className="text-red-700 underline decoration-amber-200 underline-offset-8">Sonhos</span>.
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -108,7 +108,7 @@ const PublicCatalogView = () => {
           <div className="text-center py-20 bg-white rounded-[3rem] border border-dashed border-slate-200">
             <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"><Search className="text-slate-300 w-10 h-10" /></div>
             <p className="text-slate-400 text-lg font-medium">Ops! Nenhum modelo encontrado com esse termo.</p>
-            <button onClick={() => setSearch('')} className="text-indigo-600 font-bold mt-4">Ver Todos</button>
+            <button onClick={() => setSearch('')} className="text-red-700 font-bold mt-4">Ver Todos</button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -120,7 +120,7 @@ const PublicCatalogView = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: idx * 0.05 }}
                   key={v.id}
-                  className="bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-lg shadow-slate-200/40 group hover:shadow-2xl hover:shadow-indigo-100 transition-all duration-500"
+                  className="bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-lg shadow-slate-200/40 group hover:shadow-2xl hover:shadow-amber-100 transition-all duration-500"
                 >
                   <Link to={`/vestido/${v.id}/ver`}>
                     <div className="aspect-[3/4] overflow-hidden relative">
@@ -131,11 +131,11 @@ const PublicCatalogView = () => {
                     </div>
                     <div className="p-8 space-y-4">
                       <div className="flex justify-between items-start gap-4">
-                        <h3 className="text-xl font-bold text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">{v.nome}</h3>
-                        <p className="text-indigo-600 font-extrabold text-lg">{formatCurrency(v.preco_base)}</p>
+                        <h3 className="text-xl font-bold text-slate-800 leading-tight group-hover:text-red-700 transition-colors">{v.nome}</h3>
+                        <p className="text-red-700 font-extrabold text-lg">{formatCurrency(v.preco_base)}</p>
                       </div>
                       <p className="text-slate-400 text-sm font-light line-clamp-2 leading-relaxed">{v.descricao || 'Este modelo é exclusivo da nossa nova coleção. Agende uma prova e encante-se.'}</p>
-                      <div className="pt-2 flex items-center gap-2 text-indigo-500 text-xs font-bold uppercase tracking-widest">
+                      <div className="pt-2 flex items-center gap-2 text-red-600 text-xs font-bold uppercase tracking-widest">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Disponível
                       </div>
                     </div>
@@ -151,8 +151,8 @@ const PublicCatalogView = () => {
       <footer className="bg-white border-t border-slate-100 py-20 px-6">
         <div className="max-w-7xl mx-auto flex flex-col items-center space-y-8 text-center">
           <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-2 rounded-2xl"><BrandIcon className="text-white w-6 h-6" /></div>
-            <span className="font-bold text-2xl text-slate-900 tracking-tight leading-none italic">Vitrine da Moda <span className="text-indigo-600">LC</span></span>
+            <div className="bg-red-700 p-2 rounded-2xl"><BrandIcon className="text-white w-6 h-6" /></div>
+            <span className="font-bold text-2xl text-slate-900 tracking-tight leading-none italic">Vitrine da Moda <span className="text-red-700">LC</span></span>
           </div>
           <p className="text-slate-400 max-w-md mx-auto leading-relaxed">Sua melhor opção para aluguel de vestidos de luxo. Viva seu momento especial com elegância.</p>
           <div className="flex gap-4">

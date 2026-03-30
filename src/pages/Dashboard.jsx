@@ -130,7 +130,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-20">
-        <RefreshCcw className="w-8 h-8 text-indigo-500 animate-spin" />
+        <RefreshCcw className="w-8 h-8 text-red-600 animate-spin" />
       </div>
     );
   }
@@ -139,7 +139,7 @@ const Dashboard = () => {
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="lg:col-span-4 order-1 flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Painel de <span className="text-indigo-600 underline decoration-indigo-200 underline-offset-8">Controle</span></h2>
+          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Painel de <span className="text-red-700 underline decoration-amber-200 underline-offset-8">Controle</span></h2>
           <p className="text-slate-500 mt-2 font-light">Bem-vinda de volta. Veja o desempenho da sua loja hoje.</p>
         </div>
 
@@ -147,7 +147,7 @@ const Dashboard = () => {
           <select 
             value={currentMonth}
             onChange={(e) => setCurrentMonth(parseInt(e.target.value))}
-            className="input-field max-w-[180px] bg-white border-2 border-indigo-50"
+            className="input-field max-w-[180px] bg-white border-2 border-amber-50"
           >
             <option value="-1">Todos os meses</option>
             {months.map((m, i) => (
@@ -173,8 +173,8 @@ const Dashboard = () => {
       <div className="lg:col-span-1 order-2 lg:order-4 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col h-fit lg:sticky lg:top-8">
         <div className="mb-8 flex items-center justify-between">
           <h3 className="text-xl font-bold text-slate-800">Próximas <br /> Locações</h3>
-          <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center">
-            <CalendarDays className="w-5 h-5 text-indigo-600" />
+          <div className="h-10 w-10 rounded-full bg-amber-50 flex items-center justify-center">
+            <CalendarDays className="w-5 h-5 text-amber-600" />
           </div>
         </div>
 
@@ -195,7 +195,7 @@ const Dashboard = () => {
                   <div className="relative">
                     <img 
                       src={loc.foto_url || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=100&h=100&fit=crop'} 
-                      className="w-14 h-14 rounded-2xl object-cover ring-2 ring-slate-100 group-hover:ring-indigo-200 transition-all border-2 border-white"
+                      className="w-14 h-14 rounded-2xl object-cover ring-2 ring-slate-100 group-hover:ring-amber-200 transition-all border-2 border-white"
                       alt={loc.nome}
                     />
                     {isCritical(loc.data_locacao) && (
@@ -203,7 +203,7 @@ const Dashboard = () => {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h5 className="font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">{loc.nome}</h5>
+                    <h5 className="font-bold text-slate-800 truncate group-hover:text-red-700 transition-colors">{loc.nome}</h5>
                     <p className={cn(
                       "text-xs font-medium",
                       isCritical(loc.data_locacao) ? "text-red-500" : "text-slate-400"
@@ -211,7 +211,7 @@ const Dashboard = () => {
                       {format(parseISO(loc.data_locacao), "dd 'de' MMMM", { locale: ptBR })}
                     </p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-red-500 transition-colors" />
                 </motion.div>
               </Link>
             ))}
@@ -227,16 +227,16 @@ const Dashboard = () => {
           )}
         </div>
 
-        <Link to="/locacoes" className="w-full mt-10 py-4 bg-slate-50 rounded-2xl text-slate-500 font-bold text-sm text-center hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+        <Link to="/locacoes" className="w-full mt-10 py-4 bg-slate-50 rounded-2xl text-slate-500 font-bold text-sm text-center hover:bg-amber-50 hover:text-red-700 transition-all">
           Ver todas as locações
         </Link>
       </div>
 
       <div className="lg:col-span-4 order-3 lg:order-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-3xl border border-indigo-50 shadow-xl shadow-slate-200/50 flex flex-col justify-between group transition-all duration-300 hover:shadow-indigo-100 hover:translate-y-[-4px]">
+        <div className="bg-white p-6 rounded-3xl border border-amber-50 shadow-xl shadow-slate-200/50 flex flex-col justify-between group transition-all duration-300 hover:shadow-amber-100 hover:translate-y-[-4px]">
           <div className="flex items-center justify-between mb-4">
-            <div className="bg-indigo-50 p-3 rounded-2xl group-hover:bg-indigo-100 transition-colors">
-              <DollarSign className="w-6 h-6 text-indigo-600" />
+            <div className="bg-amber-50 p-3 rounded-2xl group-hover:bg-amber-100 transition-colors">
+              <DollarSign className="w-6 h-6 text-amber-600" />
             </div>
             <TrendingUp className="w-6 h-6 text-emerald-500 bg-emerald-50 p-1 rounded-full" />
           </div>
@@ -246,7 +246,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-linear-to-br from-indigo-600 to-purple-600 p-6 rounded-3xl shadow-xl shadow-indigo-200 flex flex-col justify-between group transition-all duration-300 hover:translate-y-[-4px] text-white">
+        <div className="bg-linear-to-br from-red-700 to-red-800 p-6 rounded-3xl shadow-xl shadow-red-200 flex flex-col justify-between group transition-all duration-300 hover:translate-y-[-4px] text-white">
           <div className="flex items-center justify-between mb-4">
             <div className="bg-white/20 p-3 rounded-2xl">
               <CalendarDays className="w-6 h-6 text-white" />
@@ -254,12 +254,12 @@ const Dashboard = () => {
             <ArrowRight className="w-5 h-5 text-white/50" />
           </div>
           <div>
-            <p className="text-indigo-100 text-sm font-medium">Total Locações (Mês)</p>
+            <p className="text-amber-100 text-sm font-medium">Total Locações (Mês)</p>
             <h4 className="text-4xl font-bold mt-1 tracking-tight">{stats.qtdLocacoes} <span className="text-lg font-light opacity-80">vestidos</span></h4>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-3xl border border-indigo-50 shadow-xl shadow-slate-200/50 flex flex-col justify-between group transition-all duration-300 hover:translate-y-[-4px]">
+        <div className="bg-white p-6 rounded-3xl border border-amber-50 shadow-xl shadow-slate-200/50 flex flex-col justify-between group transition-all duration-300 hover:translate-y-[-4px]">
            <div className="flex items-center justify-between mb-4">
             <div className="bg-emerald-50 p-3 rounded-2xl">
               <Trophy className="w-6 h-6 text-emerald-600" />
@@ -315,8 +315,8 @@ const Dashboard = () => {
                   {stats.chartData.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
-                      fill={entry.isCurrent ? '#6366f1' : '#E2E8F0'} 
-                      className="transition-all duration-300 hover:fill-indigo-400"
+                      fill={entry.isCurrent ? '#b91c1c' : '#E2E8F0'} 
+                      className="transition-all duration-300 hover:fill-red-400"
                     />
                   ))}
                 </Bar>

@@ -49,7 +49,7 @@ const DressCatalog = () => {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Catálogo de <span className="text-indigo-600">Vestidos</span></h2>
+          <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Catálogo de <span className="text-red-700">Vestidos</span></h2>
           <p className="text-slate-500 font-light mt-1">Gerencie seu inventário e compartilhe com clientes.</p>
         </div>
         
@@ -57,7 +57,7 @@ const DressCatalog = () => {
            <button onClick={shareFullCatalog} className="bg-emerald-50 text-emerald-600 px-5 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-emerald-100 transition-all text-sm">
              <Share2 className="w-5 h-5" /> Compartilhar Catálogo
            </button>
-           <Link to="/catalogo/ver" target="_blank" className="bg-indigo-50 text-indigo-600 px-5 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-indigo-100 transition-all text-sm">
+           <Link to="/catalogo/ver" target="_blank" className="bg-amber-50 text-red-700 px-5 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-amber-100 transition-all text-sm">
              <ExternalLink className="w-5 h-5" /> Ver Vitrine
            </Link>
            <Link to="/novo-vestido" className="btn-primary px-5 py-3">
@@ -96,7 +96,7 @@ const DressCatalog = () => {
                     <button onClick={() => shareWhatsApp(v)} className="bg-emerald-500 text-white p-2.5 rounded-xl shadow-lg hover:bg-emerald-600 transition-colors tooltip" title="Enviar WhatsApp">
                       <Share2 className="w-4 h-4" />
                     </button>
-                    <Link to={`/vestido/${v.id}/ver`} target="_blank" className="bg-white text-indigo-600 p-2.5 rounded-xl shadow-lg hover:bg-indigo-50 transition-colors">
+                    <Link to={`/vestido/${v.id}/ver`} target="_blank" className="bg-white text-red-700 p-2.5 rounded-xl shadow-lg hover:bg-amber-50 transition-colors">
                       <ExternalLink className="w-4 h-4" />
                     </Link>
                   </div>
@@ -104,11 +104,11 @@ const DressCatalog = () => {
                 <div className="p-6 space-y-3">
                   <div className="flex justify-between items-start gap-2">
                     <h3 className="font-bold text-slate-800 text-lg leading-tight">{v.nome}</h3>
-                    <span className="text-indigo-600 font-bold whitespace-nowrap">{formatCurrency(v.preco_base)}</span>
+                    <span className="text-red-700 font-bold whitespace-nowrap">{formatCurrency(v.preco_base)}</span>
                   </div>
                   <p className="text-slate-500 text-sm line-clamp-2">{v.descricao || 'Sem descrição'}</p>
                   <div className="pt-4 flex items-center justify-between border-t border-slate-50">
-                    <Link to={`/editar-vestido/${v.id}`} className="text-slate-400 hover:text-indigo-600 transition-colors p-2"><Edit2 className="w-5 h-5" /></Link>
+                    <Link to={`/editar-vestido/${v.id}`} className="text-slate-400 hover:text-red-700 transition-colors p-2"><Edit2 className="w-5 h-5" /></Link>
                     <button onClick={() => handleDelete(v.id)} className="text-slate-400 hover:text-red-500 transition-colors p-2"><Trash2 className="w-5 h-5" /></button>
                   </div>
                 </div>
