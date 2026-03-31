@@ -24,6 +24,7 @@ import {
 import { toPng } from 'html-to-image';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
+import CanvasElement from '../components/CanvasElement';
 
 const MarketingTools = () => {
   // Inicializa o estado a partir do LocalStorage (se existir)
@@ -46,6 +47,7 @@ const MarketingTools = () => {
   });
 
   const [selectedId, setSelectedId] = useState(1);
+  const [selectedLayer, setSelectedLayer] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
   const [saveStatus, setSaveStatus] = useState(false);
   const [containerWidth, setContainerWidth] = useState(500);
@@ -94,7 +96,7 @@ const MarketingTools = () => {
   };
 
   const updateProduct = (id, field, value) => {
-    setProducts(products.map(p => p.id === id ? { ...p, [field]: value } : p));
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
   };
 
   const loadFromCatalog = async () => {
@@ -165,21 +167,48 @@ const MarketingTools = () => {
           <div ref={containerRef} className="relative shadow-2xl overflow-hidden bg-white w-full max-w-[400px] lg:max-w-[500px] aspect-square border-4 border-white rounded-3xl lg:rounded-xl">
             <div className="absolute top-0 left-0 origin-top-left" style={{ transform: `scale(${containerWidth / 1028})`, width: '1028px', height: '1028px' }}>
               <div ref={el => previewRefs.current[activeProduct.id] = el} className="w-[1028px] h-[1028px] relative overflow-hidden" style={{ width: '1028px', height: '1028px', backgroundColor: activeProduct.bgColor || '#ffffff' }}>
-                <div className="absolute inset-0 flex z-10 overflow-hidden">
+                <div className="absolute inset-0 flex z-10 overflow-hidden" onClick={() => setSelectedLayer(null)}>
                   {activeProduct.imagem1 && activeProduct.imagem2 ? (
                     <>
-                      <div className="flex-1 h-full relative overflow-hidden">
-                        <img src={activeProduct.imagem1} className="absolute inset-0 w-full h-full object-cover" style={{ transform: `scale(${activeProduct.scale1 || 1}) translate(${activeProduct.x1 || 0}px, ${activeProduct.y1 || 0}px)` }} />
-                      </div>
-                      <div className="w-[12px] h-full bg-white z-20 shadow-[0_0_30px_rgba(0,0,0,0.3)]" />
-                      <div className="flex-1 h-full relative overflow-hidden">
-                        <img src={activeProduct.imagem2} className="absolute inset-0 w-full h-full object-cover" style={{ transform: `scale(${activeProduct.scale2 || 1}) translate(${activeProduct.x2 || 0}px, ${activeProduct.y2 || 0}px)` }} />
-                      </div>
+                      <CanvasElement
+                        isImageWrapper
+                        className="flex-1"
+                        mode="translate"
+                        x={activeProduct.x1 || 0} y={activeProduct.y1 || 0} scale={activeProduct.scale1 || 1}
+                        zoomFactor={containerWidth / 1028}
+                        isSelected={selectedLayer === 'imagem1'}
+                        onSelect={() => setSelectedLayer('imagem1')}
+                        onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x1', nx); updateProduct(activeProduct.id, 'y1', ny); updateProduct(activeProduct.id, 'scale1', ns); }}
+                      >
+                        <img src={activeProduct.imagem1} className="absolute inset-0 w-full h-full object-cover" />
+                      </CanvasElement>
+                      <div className="w-[12px] h-full bg-white z-20 shadow-[0_0_30px_rgba(0,0,0,0.3)] pointer-events-none" />
+                      <CanvasElement
+                        isImageWrapper
+                        className="flex-1"
+                        mode="translate"
+                        x={activeProduct.x2 || 0} y={activeProduct.y2 || 0} scale={activeProduct.scale2 || 1}
+                        zoomFactor={containerWidth / 1028}
+                        isSelected={selectedLayer === 'imagem2'}
+                        onSelect={() => setSelectedLayer('imagem2')}
+                        onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x2', nx); updateProduct(activeProduct.id, 'y2', ny); updateProduct(activeProduct.id, 'scale2', ns); }}
+                      >
+                        <img src={activeProduct.imagem2} className="absolute inset-0 w-full h-full object-cover" />
+                      </CanvasElement>
                     </>
                   ) : activeProduct.imagem1 || activeProduct.imagem2 ? (
-                    <div className="w-full h-full relative overflow-hidden">
-                      <img src={activeProduct.imagem1 || activeProduct.imagem2} className="absolute inset-0 w-full h-full object-contain" style={{ transform: `scale(${activeProduct.scale1 || 1}) translate(${activeProduct.x1 || 0}px, ${activeProduct.y1 || 0}px)` }} />
-                    </div>
+                    <CanvasElement
+                      isImageWrapper
+                      className="w-full h-full"
+                      mode="translate"
+                      x={activeProduct.x1 || 0} y={activeProduct.y1 || 0} scale={activeProduct.scale1 || 1}
+                      zoomFactor={containerWidth / 1028}
+                      isSelected={selectedLayer === 'imagem1'}
+                      onSelect={() => setSelectedLayer('imagem1')}
+                      onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x1', nx); updateProduct(activeProduct.id, 'y1', ny); updateProduct(activeProduct.id, 'scale1', ns); }}
+                    >
+                      <img src={activeProduct.imagem1 || activeProduct.imagem2} className="absolute inset-0 w-full h-full object-contain" />
+                    </CanvasElement>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-200">
                       <ImageIcon className="w-72 h-72 opacity-20" />
@@ -188,22 +217,40 @@ const MarketingTools = () => {
                 </div>
 
                 {activeProduct.nome && (
-                  <div className="absolute z-40 flex flex-col pointer-events-none" style={{ bottom: `${230 - (activeProduct.nameY || 0)}px`, left: `${48 + (activeProduct.nameX || 0)}px`, transform: `scale(${activeProduct.nameScale || 1})`, transformOrigin: 'bottom left' }}>
-                    <h2 className="text-[4rem] font-black uppercase tracking-[-0.08em] font-boulder italic leading-none" style={{ color: activeProduct.nameColor || '#ffffff', textShadow: '3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 25px rgba(0,0,0,0.6)', WebkitTextStroke: '2px white' }}>{activeProduct.nome}</h2>
-                  </div>
+                  <CanvasElement
+                    mode="absolute"
+                    style={{ bottom: `${230 - (activeProduct.nameY || 0)}px`, left: `${48 + (activeProduct.nameX || 0)}px`, zIndex: 40 }}
+                    className="flex flex-col"
+                    x={activeProduct.nameX || 0} y={activeProduct.nameY || 0} scale={activeProduct.nameScale || 1}
+                    zoomFactor={containerWidth / 1028}
+                    isSelected={selectedLayer === 'name'}
+                    onSelect={() => setSelectedLayer('name')}
+                    onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'nameX', nx); updateProduct(activeProduct.id, 'nameY', ny); updateProduct(activeProduct.id, 'nameScale', ns); }}
+                  >
+                    <h2 className="text-[4rem] font-black uppercase tracking-[-0.08em] font-boulder italic leading-none pointer-events-none" style={{ color: activeProduct.nameColor || '#ffffff', textShadow: '3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 25px rgba(0,0,0,0.6)', WebkitTextStroke: '2px white' }}>{activeProduct.nome}</h2>
+                  </CanvasElement>
                 )}
 
                 {activeProduct.preco && (
-                  <div className="absolute z-40 flex flex-col pointer-events-none" style={{ bottom: `${230 - (activeProduct.priceY || 0)}px`, left: `${48 + (activeProduct.priceX || 0)}px`, transform: `scale(${activeProduct.priceScale || 1})`, transformOrigin: 'bottom left' }}>
-                    <div className="flex items-baseline gap-2">
+                  <CanvasElement
+                    mode="absolute"
+                    style={{ bottom: `${230 - (activeProduct.priceY || 0)}px`, left: `${48 + (activeProduct.priceX || 0)}px`, zIndex: 40 }}
+                    className="flex flex-col"
+                    x={activeProduct.priceX || 0} y={activeProduct.priceY || 0} scale={activeProduct.priceScale || 1}
+                    zoomFactor={containerWidth / 1028}
+                    isSelected={selectedLayer === 'price'}
+                    onSelect={() => setSelectedLayer('price')}
+                    onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'priceX', nx); updateProduct(activeProduct.id, 'priceY', ny); updateProduct(activeProduct.id, 'priceScale', ns); }}
+                  >
+                    <div className="flex items-baseline gap-2 pointer-events-none">
                         <span className="text-[2.2rem] font-black italic shadow-black font-boulder" style={{ color: activeProduct.priceColor || '#ffffff', textShadow: '2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 5px 5px 15px rgba(0,0,0,0.4)', WebkitTextStroke: '1px white' }}>R$</span>
                         <span className="text-[5.4rem] font-black italic tracking-[-0.1em] font-boulder" style={{ color: activeProduct.priceColor || '#ffffff', textShadow: '3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 30px rgba(0,0,0,0.7)', WebkitTextStroke: '2px white' }}>{activeProduct.preco}</span>
                       </div>
-                  </div>
+                  </CanvasElement>
                 )}
 
-                <div className="absolute bottom-0 left-0 w-full z-40">
-                  <img src="/RODAPE.png" alt="Rodapé" className="w-full h-auto" />
+                <div className="absolute bottom-0 left-0 w-full z-40 pointer-events-none">
+                  <img src="/RODAPE.png" alt="Rodapé" className="w-full h-auto pointer-events-none" />
                 </div>
               </div>
             </div>
@@ -269,97 +316,47 @@ const MarketingTools = () => {
                       </div>
 
                       {/* Ajuste de Nome */}
-                      <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 space-y-3">
+                      <div className={cn("bg-amber-50 p-4 rounded-2xl border space-y-3 transition-all cursor-pointer", selectedLayer === 'name' ? 'border-red-400 shadow-md ring-4 ring-red-100' : 'border-amber-100 hover:border-red-200')} onClick={() => setSelectedLayer('name')}>
                         <div className="flex items-center justify-between">
-                           <div className="flex items-center gap-2 text-[10px] font-black uppercase text-indigo-700 italic"><Type className="w-4 h-4" /> Nome</div>
-                           <div className="flex items-center gap-2">
+                           <div className="flex items-center gap-2 text-[10px] font-black uppercase text-indigo-700 italic"><Type className="w-4 h-4" /> Nome {selectedLayer === 'name' && <span className="text-red-600">(Livre Manipulação Ativa)</span>}</div>
+                           <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                               <Palette className="w-3 h-3 text-red-500" />
                               <input type="color" value={p.nameColor || '#ffffff'} onChange={(e) => updateProduct(p.id, 'nameColor', e.target.value)} className="w-6 h-6 rounded-md border-none cursor-pointer" />
                            </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-2">
-                           <div className="space-y-1 py-1">
-                              <label className="text-[8px] font-bold text-slate-400 uppercase">Tam</label>
-                              <input type="range" min="0.2" max="3" step="0.01" value={p.nameScale || 1} onChange={(e) => updateProduct(p.id, 'nameScale', parseFloat(e.target.value))} className="w-full mobile-slider" />
-                           </div>
-                           <div className="space-y-1 py-1">
-                              <label className="text-[8px] font-bold text-slate-400 uppercase">X</label>
-                              <input type="range" min="-100" max="800" value={p.nameX || 0} onChange={(e) => updateProduct(p.id, 'nameX', parseInt(e.target.value))} className="w-full mobile-slider" />
-                           </div>
-                           <div className="space-y-1 py-1">
-                              <label className="text-[8px] font-bold text-slate-400 uppercase">Y</label>
-                              <input type="range" min="-300" max="600" value={p.nameY || 0} onChange={(e) => updateProduct(p.id, 'nameY', parseInt(e.target.value))} className="w-full mobile-slider" />
-                           </div>
-                        </div>
+                        {selectedLayer === 'name' && <p className="text-[10px] text-slate-500 font-bold border-t border-amber-200 pt-2 opacity-80 animate-in fade-in">Arraste o texto diretamente no canvas ao lado. Puxe as alças nos cantos para redimensionar proporcionalmente.</p>}
                       </div>
 
                       {/* Ajuste do Preço */}
-                      <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 space-y-3">
+                      <div className={cn("bg-amber-50 p-4 rounded-2xl border space-y-3 transition-all cursor-pointer", selectedLayer === 'price' ? 'border-amber-500 shadow-md ring-4 ring-amber-100' : 'border-amber-100 hover:border-amber-300')} onClick={() => setSelectedLayer('price')}>
                         <div className="flex items-center justify-between">
-                           <div className="flex items-center gap-2 text-[10px] font-black uppercase text-amber-700 italic"><Coins className="w-4 h-4" /> Preço</div>
-                           <div className="flex items-center gap-2">
+                           <div className="flex items-center gap-2 text-[10px] font-black uppercase text-amber-700 italic"><Coins className="w-4 h-4" /> Preço {selectedLayer === 'price' && <span className="text-amber-600">(Livre Manipulação Ativa)</span>}</div>
+                           <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                               <Palette className="w-3 h-3 text-amber-400" />
                               <input type="color" value={p.priceColor || '#ffffff'} onChange={(e) => updateProduct(p.id, 'priceColor', e.target.value)} className="w-6 h-6 rounded-md border-none cursor-pointer" />
                            </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-2">
-                           <div className="space-y-1 py-1">
-                              <label className="text-[8px] font-bold text-slate-400 uppercase">Tam</label>
-                              <input type="range" min="0.2" max="3" step="0.01" value={p.priceScale || 1} onChange={(e) => updateProduct(p.id, 'priceScale', parseFloat(e.target.value))} className="w-full mobile-slider" />
-                           </div>
-                           <div className="space-y-1 py-1">
-                              <label className="text-[8px] font-bold text-slate-400 uppercase">X</label>
-                              <input type="range" min="-100" max="800" value={p.priceX || 0} onChange={(e) => updateProduct(p.id, 'priceX', parseInt(e.target.value))} className="w-full mobile-slider" />
-                           </div>
-                           <div className="space-y-1 py-1">
-                              <label className="text-[8px] font-bold text-slate-400 uppercase">Y</label>
-                              <input type="range" min="-300" max="600" value={p.priceY || 0} onChange={(e) => updateProduct(p.id, 'priceY', parseInt(e.target.value))} className="w-full mobile-slider" />
-                           </div>
-                        </div>
+                        {selectedLayer === 'price' && <p className="text-[10px] text-slate-500 font-bold border-t border-amber-200 pt-2 opacity-80 animate-in fade-in">Arraste o preço diretamente no canvas ao lado. Puxe as alças nos cantos para redimensionar proporcionalmente.</p>}
                       </div>
                     </div>
                   )}
 
                   {/* AJUSTES DE IMAGEM */}
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 mb-1 italic">
-                      <Camera className="w-3 h-3" /> Enquadramento Principal
+                  <div className={cn("bg-slate-50 p-4 rounded-2xl border space-y-3 transition-all cursor-pointer", selectedLayer === 'imagem1' ? 'border-red-500 shadow-md ring-4 ring-red-100 bg-white' : 'border-slate-100 hover:border-slate-300')} onClick={() => setSelectedLayer('imagem1')}>
+                    <div className="flex items-center justify-between text-[10px] font-black uppercase text-slate-500 mb-1 italic">
+                      <span className="flex items-center gap-2"><Camera className="w-3 h-3" /> Enquadramento Principal</span>
+                      {selectedLayer === 'imagem1' && <span className="text-red-600 font-bold bg-red-50 px-2 rounded-full">ATIVO E EDITÁVEL</span>}
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="space-y-1 py-1">
-                        <label className="text-[8px] font-bold text-slate-400">Zoom</label>
-                        <input type="range" min="0.5" max="3" step="0.01" value={p.scale1 || 1} onChange={(e) => updateProduct(p.id, 'scale1', parseFloat(e.target.value))} className="w-full mobile-slider" />
-                      </div>
-                      <div className="space-y-1 py-1">
-                        <label className="text-[8px] font-bold text-slate-400">X</label>
-                        <input type="range" min="-400" max="400" value={p.x1 || 0} onChange={(e) => updateProduct(p.id, 'x1', parseInt(e.target.value))} className="w-full mobile-slider" />
-                      </div>
-                      <div className="space-y-1 py-1">
-                        <label className="text-[8px] font-bold text-slate-400">Y</label>
-                        <input type="range" min="-400" max="400" value={p.y1 || 0} onChange={(e) => updateProduct(p.id, 'y1', parseInt(e.target.value))} className="w-full mobile-slider" />
-                      </div>
-                    </div>
+                    {selectedLayer === 'imagem1' && <p className="text-[10px] text-slate-400 font-bold mt-2 animate-in fade-in border-t border-slate-100 pt-2"><span className="text-red-500">Arraste a imagem no canvas</span>. Para aplicar Zoom, use o controle deslizante (slider) na parte inferior ou a roda do mouse quando selecionado.</p>}
                   </div>
 
                   {p.imagem2 && (
-                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500 mb-1 italic">
-                        <Camera className="w-4 h-4" /> Enquadramento Secundário
+                    <div className={cn("bg-slate-50 p-4 rounded-2xl border space-y-3 transition-all cursor-pointer", selectedLayer === 'imagem2' ? 'border-red-500 shadow-md ring-4 ring-red-100 bg-white' : 'border-slate-100 hover:border-slate-300')} onClick={() => setSelectedLayer('imagem2')}>
+                      <div className="flex items-center justify-between text-[10px] font-black uppercase text-slate-500 mb-1 italic">
+                        <span className="flex items-center gap-2"><Camera className="w-4 h-4" /> Enquadramento Secundário</span>
+                        {selectedLayer === 'imagem2' && <span className="text-red-600 font-bold bg-red-50 px-2 rounded-full">ATIVO E EDITÁVEL</span>}
                       </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        <div className="space-y-1 py-1">
-                          <label className="text-[8px] font-bold text-slate-400">Zoom</label>
-                          <input type="range" min="0.5" max="3" step="0.01" value={p.scale2 || 1} onChange={(e) => updateProduct(p.id, 'scale2', parseFloat(e.target.value))} className="w-full mobile-slider" />
-                        </div>
-                        <div className="space-y-1 py-1">
-                          <label className="text-[8px] font-bold text-slate-400">X</label>
-                          <input type="range" min="-400" max="400" value={p.x2 || 0} onChange={(e) => updateProduct(p.id, 'x2', parseInt(e.target.value))} className="w-full mobile-slider" />
-                        </div>
-                        <div className="space-y-1 py-1">
-                          <label className="text-[8px] font-bold text-slate-400">Y</label>
-                          <input type="range" min="-400" max="400" value={p.y2 || 0} onChange={(e) => updateProduct(p.id, 'y2', parseInt(e.target.value))} className="w-full mobile-slider" />
-                        </div>
-                      </div>
+                      {selectedLayer === 'imagem2' && <p className="text-[10px] text-slate-400 font-bold mt-2 animate-in fade-in border-t border-slate-100 pt-2"><span className="text-red-500">Arraste a imagem no canvas</span>. Para aplicar Zoom, use o controle deslizante (slider) na parte inferior ou a roda do mouse quando selecionado.</p>}
                     </div>
                   )}
 
