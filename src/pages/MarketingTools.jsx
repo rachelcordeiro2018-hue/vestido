@@ -240,6 +240,7 @@ const MarketingTools = () => {
                         x={activeProduct.x1 || 0} y={activeProduct.y1 || 0} scale={activeProduct.scale1 || 1}
                         zoomFactor={containerWidth / 1028}
                         isSelected={selectedLayer === 'imagem1'}
+                        isExporting={isExporting}
                         onSelect={() => setSelectedLayer('imagem1')}
                         onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x1', nx); updateProduct(activeProduct.id, 'y1', ny); updateProduct(activeProduct.id, 'scale1', ns); }}
                       >
@@ -253,6 +254,7 @@ const MarketingTools = () => {
                         x={activeProduct.x2 || 0} y={activeProduct.y2 || 0} scale={activeProduct.scale2 || 1}
                         zoomFactor={containerWidth / 1028}
                         isSelected={selectedLayer === 'imagem2'}
+                        isExporting={isExporting}
                         onSelect={() => setSelectedLayer('imagem2')}
                         onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x2', nx); updateProduct(activeProduct.id, 'y2', ny); updateProduct(activeProduct.id, 'scale2', ns); }}
                       >
@@ -267,6 +269,7 @@ const MarketingTools = () => {
                       x={activeProduct.x1 || 0} y={activeProduct.y1 || 0} scale={activeProduct.scale1 || 1}
                       zoomFactor={containerWidth / 1028}
                       isSelected={selectedLayer === 'imagem1'}
+                      isExporting={isExporting}
                       onSelect={() => setSelectedLayer('imagem1')}
                       onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x1', nx); updateProduct(activeProduct.id, 'y1', ny); updateProduct(activeProduct.id, 'scale1', ns); }}
                     >
@@ -287,6 +290,7 @@ const MarketingTools = () => {
                     x={activeProduct.nameX || 0} y={activeProduct.nameY || 0} scale={activeProduct.nameScale || 1}
                     zoomFactor={containerWidth / 1028}
                     isSelected={selectedLayer === 'name'}
+                    isExporting={isExporting}
                     onSelect={() => setSelectedLayer('name')}
                     onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'nameX', nx); updateProduct(activeProduct.id, 'nameY', ny); updateProduct(activeProduct.id, 'nameScale', ns); }}
                   >
@@ -302,6 +306,7 @@ const MarketingTools = () => {
                     x={activeProduct.priceX || 0} y={activeProduct.priceY || 0} scale={activeProduct.priceScale || 1}
                     zoomFactor={containerWidth / 1028}
                     isSelected={selectedLayer === 'price'}
+                    isExporting={isExporting}
                     onSelect={() => setSelectedLayer('price')}
                     onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'priceX', nx); updateProduct(activeProduct.id, 'priceY', ny); updateProduct(activeProduct.id, 'priceScale', ns); }}
                   >

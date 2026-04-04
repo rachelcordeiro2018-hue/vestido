@@ -11,7 +11,8 @@ const CanvasElement = ({
   zoomFactor = 1,
   mode = 'translate', // 'translate' | 'absolute'
   className,
-  isImageWrapper = false // specific handling for the background images
+  isImageWrapper = false, // specific handling for the background images
+  isExporting = false
 }) => {
   const containerRef = useRef(null);
   
@@ -51,7 +52,7 @@ const CanvasElement = ({
   });
 
   const handlePointerDown = (e) => {
-    if (e.target.closest('.resize-handle')) return;
+    if (e.target.closest('.resize-handle') || isExporting) return;
     
     e.stopPropagation();
     onSelect();
@@ -136,6 +137,7 @@ const CanvasElement = ({
   };
 
   const handleResizePointerDown = (e, corner) => {
+    if (isExporting) return;
     e.stopPropagation();
     e.preventDefault();
     onSelect();
@@ -178,51 +180,61 @@ const CanvasElement = ({
     return (
       <div 
         ref={containerRef}
-        style={{ ...style, cursor: isSelected ? 'move' : 'pointer', touchAction: 'none' }}
+        style={{ ...style, cursor: isSelected && !isExporting ? 'move' : 'pointer', touchAction: 'none' }}
         className={cn("w-full h-full relative group overflow-hidden pointer-events-auto", className)}
         onPointerDown={handlePointerDown}
         onClick={(e) => e.stopPropagation()}
       >
         <div 
-          className="w-full h-full absolute inset-0 pointer-events-none"
-          style={{ transform: `scale(${scale}) translate(${x}px, ${y}px)` }}
+          className="absolute pointer-events-none overflow-hidden"
+          style={{ 
+            width: `${scale * 100}%`, 
+            height: `${scale * 100}%`,
+            left: `${x}px`,
+            top: `${y}px`,
+            // If scale is 1 and x/y is 0, it fills parent perfectly
+          }}
         >
           {children}
         </div>
         
-        {/* Frame Highlight */}
-        <div className={cn(
-          "absolute inset-0 pointer-events-none transition-all z-40",
-          isSelected ? "outline outline-[6px] outline-red-600 outline-offset-[-6px] bg-red-600/10 shadow-inner" : "group-hover:outline group-hover:outline-[6px] group-hover:outline-red-400 group-hover:outline-offset-[-6px] group-hover:bg-red-400/5"
-        )} />
-        
-        {isSelected && (
-          <div className="absolute inset-x-0 bottom-6 flex justify-center pointer-events-none z-50">
-            <div className="bg-red-600/90 text-white px-3 py-2 rounded-full shadow-2xl backdrop-blur-sm border 2 border-red-400 text-xs font-bold flex items-center gap-2 pointer-events-auto">
-               <span className="opacity-80">ZOOM:</span>
-               
-               <button 
-                  onPointerDown={(e) => e.stopPropagation()} 
-                  onClick={() => onUpdate(x, y, Math.max(0.2, scale - 0.05))}
-                  className="w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/40 rounded-full cursor-pointer transition-colors font-black"
-               >-</button>
-
-               <input 
-                 type="range" 
-                 min="0.2" max="3" step="0.01" 
-                 value={scale} 
-                 onChange={(e) => onUpdate(x, y, parseFloat(e.target.value))}
-                 onPointerDown={(e) => e.stopPropagation()}
-                 className="w-20 accent-white pointer-events-auto cursor-ew-resize"
-               />
-
-               <button 
-                  onPointerDown={(e) => e.stopPropagation()} 
-                  onClick={() => onUpdate(x, y, Math.min(3, scale + 0.05))}
-                  className="w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/40 rounded-full cursor-pointer transition-colors font-black"
-               >+</button>
-            </div>
-          </div>
+        {/* Frame Highlight - Only show when NOT exporting */}
+        {!isExporting && (
+          <>
+            <div className={cn(
+              "absolute inset-0 pointer-events-none transition-all z-40",
+              isSelected ? "outline outline-[6px] outline-red-600 outline-offset-[-6px] bg-red-600/10 shadow-inner" : "group-hover:outline group-hover:outline-[6px] group-hover:outline-red-400 group-hover:outline-offset-[-6px] group-hover:bg-red-400/5"
+            )} />
+            
+            {isSelected && (
+              <div className="absolute inset-x-0 bottom-6 flex justify-center pointer-events-none z-50">
+                <div className="bg-red-600/90 text-white px-3 py-2 rounded-full shadow-2xl backdrop-blur-sm border 2 border-red-400 text-xs font-bold flex items-center gap-2 pointer-events-auto">
+                   <span className="opacity-80">ZOOM:</span>
+                   
+                   <button 
+                      onPointerDown={(e) => e.stopPropagation()} 
+                      onClick={() => onUpdate(x, y, Math.max(0.2, scale - 0.05))}
+                      className="w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/40 rounded-full cursor-pointer transition-colors font-black"
+                   >-</button>
+    
+                   <input 
+                     type="range" 
+                     min="0.2" max="3" step="0.01" 
+                     value={scale} 
+                     onChange={(e) => onUpdate(x, y, parseFloat(e.target.value))}
+                     onPointerDown={(e) => e.stopPropagation()}
+                     className="w-20 accent-white pointer-events-auto cursor-ew-resize"
+                   />
+    
+                   <button 
+                      onPointerDown={(e) => e.stopPropagation()} 
+                      onClick={() => onUpdate(x, y, Math.min(3, scale + 0.05))}
+                      className="w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/40 rounded-full cursor-pointer transition-colors font-black"
+                   >+</button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     );
@@ -234,14 +246,13 @@ const CanvasElement = ({
       ref={containerRef}
       style={{ 
         ...style,
-        cursor: isSelected ? 'move' : 'pointer',
-        transform: `scale(${scale})`, 
-        transformOrigin: 'bottom left',
+        cursor: isSelected && !isExporting ? 'move' : 'pointer',
+        fontSize: `${scale}em`, 
         touchAction: 'none' // Prevent pull-down refresh on mobile while dragging text
       }}
       className={cn(
         "absolute pointer-events-auto transition-shadow group shrink-0",
-        isSelected ? "outline outline-2 outline-dashed outline-red-600 z-50" : "hover:outline hover:outline-2 hover:outline-dashed hover:outline-red-400 z-40",
+        isSelected && !isExporting ? "outline outline-2 outline-dashed outline-red-600 z-50" : (!isExporting ? "hover:outline hover:outline-2 hover:outline-dashed hover:outline-red-400 z-40" : ""),
         className
       )}
       onPointerDown={handlePointerDown}
@@ -251,7 +262,7 @@ const CanvasElement = ({
         {children}
       </div>
       
-      {isSelected && (
+      {isSelected && !isExporting && (
         <div className="absolute inset-0 pointer-events-none min-w-[50px] min-h-[50px]">
           {renderHandle('tl', '-top-4 -left-4 md:-top-3 md:-left-3 cursor-nwse-resize pointer-events-auto')}
           {renderHandle('tr', '-top-4 -right-4 md:-top-3 md:-right-3 cursor-nesw-resize pointer-events-auto')}
