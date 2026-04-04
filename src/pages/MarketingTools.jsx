@@ -157,14 +157,13 @@ const MarketingTools = () => {
 
       const product = activeProduct;
       const ref = previewRefs.current[product.id];
+      const parentScaler = ref?.parentElement;
       
-      if (ref) {
+      if (ref && parentScaler) {
         // 2. Tentar converter as imagens para DataURL via Proxy para burlar o CORS/Taint
-        // Isso é o que resolve o erro de "arte em branco" quando há fotos externas.
         const convertToDataURL = async (url) => {
           if (!url || typeof url !== 'string' || url.startsWith('data:') || url.startsWith('blob:')) return url;
           try {
-            // Usando o proxy corsproxy.io que é público e estável
             const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
             const response = await fetch(proxyUrl);
             const blob = await response.blob();
@@ -174,7 +173,6 @@ const MarketingTools = () => {
               reader.readAsDataURL(blob);
             });
           } catch (e) {
-            console.warn("Proxy failed for", url, e);
             return url;
           }
         };
@@ -186,23 +184,32 @@ const MarketingTools = () => {
         if (img1 !== product.imagem1 || img2 !== product.imagem2) {
           updateProduct(product.id, 'imagem1', img1);
           updateProduct(product.id, 'imagem2', img2);
-          await new Promise(r => setTimeout(r, 500)); // Tempo extra para o navegador carregar o Base64
+          await new Promise(r => setTimeout(r, 600)); 
         }
 
-        // 3. Captura com configurações de máxima compatibilidade mobile
-        const dataUrl = await toPng(ref, {
-          quality: 0.95,
-          pixelRatio: 1.2, // Um pouco acima de 1 para nitidez, mas sem estourar memória
-          cacheBust: true,
-          style: { transform: 'none' }
-        });
+        // --- HACK DEFINITIVO PARA SAFARI/IPHONE ---
+        // O Safari falha ao capturar elementos que estão dentro de um pai com "transform: scale"
+        // Vamos remover o zoom visual do pai temporariamente durante o clique
+        const originalTransform = parentScaler.style.transform;
+        parentScaler.style.transform = 'none';
+        
+        try {
+          const dataUrl = await toPng(ref, {
+            quality: 0.95,
+            pixelRatio: 1, // Reduzindo para 1 para evitar crash de memória no iOS
+            cacheBust: true
+          });
 
-        if (!dataUrl || dataUrl.length < 100) throw new Error("Image capture failed");
+          if (!dataUrl || dataUrl.length < 500) throw new Error("Capture empty");
 
-        const link = document.createElement('a');
-        link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
-        link.href = dataUrl;
-        link.click();
+          const link = document.createElement('a');
+          link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
+          link.href = dataUrl;
+          link.click();
+        } finally {
+          // Restaura o zoom original na tela do usuário
+          parentScaler.style.transform = originalTransform;
+        }
       }
     } catch (err) {
       console.error('Export Error:', err);
