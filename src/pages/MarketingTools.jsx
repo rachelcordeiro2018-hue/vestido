@@ -142,6 +142,8 @@ const MarketingTools = () => {
             width: 1028,
             height: 1028,
             pixelRatio: 1,
+            cacheBust: true,
+            fetchRequest: { credentials: 'omit' },
             style: { transform: 'none', transformOrigin: 'top left', left: '0', top: '0' }
           });
           const link = document.createElement('a');
@@ -180,7 +182,7 @@ const MarketingTools = () => {
                         onSelect={() => setSelectedLayer('imagem1')}
                         onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x1', nx); updateProduct(activeProduct.id, 'y1', ny); updateProduct(activeProduct.id, 'scale1', ns); }}
                       >
-                        <img src={activeProduct.imagem1} className="absolute inset-0 w-full h-full object-cover" />
+                        <img crossOrigin="anonymous" src={activeProduct.imagem1} className="absolute inset-0 w-full h-full object-cover" />
                       </CanvasElement>
                       <div className="w-[12px] h-full bg-white z-20 shadow-[0_0_30px_rgba(0,0,0,0.3)] pointer-events-none" />
                       <CanvasElement
@@ -193,7 +195,7 @@ const MarketingTools = () => {
                         onSelect={() => setSelectedLayer('imagem2')}
                         onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x2', nx); updateProduct(activeProduct.id, 'y2', ny); updateProduct(activeProduct.id, 'scale2', ns); }}
                       >
-                        <img src={activeProduct.imagem2} className="absolute inset-0 w-full h-full object-cover" />
+                        <img crossOrigin="anonymous" src={activeProduct.imagem2} className="absolute inset-0 w-full h-full object-cover" />
                       </CanvasElement>
                     </>
                   ) : activeProduct.imagem1 || activeProduct.imagem2 ? (
@@ -207,7 +209,7 @@ const MarketingTools = () => {
                       onSelect={() => setSelectedLayer('imagem1')}
                       onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x1', nx); updateProduct(activeProduct.id, 'y1', ny); updateProduct(activeProduct.id, 'scale1', ns); }}
                     >
-                      <img src={activeProduct.imagem1 || activeProduct.imagem2} className="absolute inset-0 w-full h-full object-contain" />
+                      <img crossOrigin="anonymous" src={activeProduct.imagem1 || activeProduct.imagem2} className="absolute inset-0 w-full h-full object-contain" />
                     </CanvasElement>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-200">
@@ -250,7 +252,7 @@ const MarketingTools = () => {
                 )}
 
                 <div className="absolute bottom-0 left-0 w-full z-40 pointer-events-none">
-                  <img src="/RODAPE.png" alt="Rodapé" className="w-full h-auto pointer-events-none" />
+                  <img crossOrigin="anonymous" src="/RODAPE.png" alt="Rodapé" className="w-full h-auto pointer-events-none" />
                 </div>
               </div>
             </div>

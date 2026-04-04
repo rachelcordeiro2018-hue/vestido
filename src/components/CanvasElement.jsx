@@ -39,55 +39,101 @@ const CanvasElement = ({
     return () => el.removeEventListener('wheel', handleNativeWheel);
   }, [isImageWrapper]);
 
+  const pointersRef = useRef(new Map());
+  const dragStartRef = useRef(null);
+
   const handlePointerDown = (e) => {
     // If clicking a resize handle, ignore drag
-    if (e.target.closest('.resize-handle')) return;
+    if (e.target?.closest?.('.resize-handle')) return;
     
     e.stopPropagation();
     onSelect();
 
-    // prevent default so it doesn't cause weird drag/drop of images natively in some browsers
-    // Note: preventDefault on pointerdown blocks click. If we need click, we just let it be.
-    // e.preventDefault(); 
-    
     // For touch devices, preventDefault stops scrolling while dragging
     if (e.pointerType === 'touch') {
       try { e.target.setPointerCapture(e.pointerId); } catch(err){}
     }
 
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startObjX = x;
-    const startObjY = y;
+    const { x: currentX, y: currentY, scale: currentScale } = propsRef.current;
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointersRef.current.size === 1) {
+        dragStartRef.current = {
+            startX: e.clientX,
+            startY: e.clientY,
+            startObjX: currentX,
+            startObjY: currentY
+        };
+    } 
+    else if (pointersRef.current.size === 2 && isImageWrapper) {
+        const ptrs = Array.from(pointersRef.current.values());
+        dragStartRef.current.initialPinchDist = Math.hypot(ptrs[0].x - ptrs[1].x, ptrs[0].y - ptrs[1].y);
+        dragStartRef.current.initialScale = currentScale;
+    }
 
     const onPointerMove = (moveEvent) => {
-      // Use movement delta scaled by zoom
-      const dx = (moveEvent.clientX - startX) / zoomFactor;
-      const dy = (moveEvent.clientY - startY) / zoomFactor;
-      
-      if (mode === 'translate') {
-        const visualDx = dx / scale;
-        const visualDy = dy / scale;
-        onUpdate(startObjX + visualDx, startObjY + visualDy, scale);
-      } else {
-        // Absolute text uses "bottom" instead of "top" in MarketingTools 
-        // bottom: 230 - nameY => so dy needs to be added, not subtracted, to move in the physical mouse direction
-        onUpdate(startObjX + dx, startObjY + dy, scale);
+      if (!pointersRef.current.has(moveEvent.pointerId)) return;
+      pointersRef.current.set(moveEvent.pointerId, { x: moveEvent.clientX, y: moveEvent.clientY });
+
+      if (pointersRef.current.size === 2 && isImageWrapper) {
+         const ptrs = Array.from(pointersRef.current.values());
+         const dist = Math.hypot(ptrs[0].x - ptrs[1].x, ptrs[0].y - ptrs[1].y);
+         const scaleMultiplier = dist / dragStartRef.current.initialPinchDist;
+         const newScale = Math.max(0.1, dragStartRef.current.initialScale * scaleMultiplier);
+         propsRef.current.onUpdate(propsRef.current.x, propsRef.current.y, newScale);
+      } 
+      else if (pointersRef.current.size === 1) {
+         const dx = (moveEvent.clientX - dragStartRef.current.startX) / zoomFactor;
+         const dy = (moveEvent.clientY - dragStartRef.current.startY) / zoomFactor;
+         const { scale } = propsRef.current;
+         
+         if (mode === 'translate') {
+           const visualDx = dx / scale;
+           const visualDy = dy / scale;
+           propsRef.current.onUpdate(
+               dragStartRef.current.startObjX + visualDx, 
+               dragStartRef.current.startObjY + visualDy, 
+               scale
+           );
+         } else {
+           propsRef.current.onUpdate(
+               dragStartRef.current.startObjX + dx, 
+               dragStartRef.current.startObjY + dy, 
+               scale
+           );
+         }
       }
     };
 
     const onPointerUp = (upEvent) => {
       if (upEvent && upEvent.pointerId) {
+        pointersRef.current.delete(upEvent.pointerId);
         try { upEvent.target.releasePointerCapture(upEvent.pointerId); } catch(err){}
       }
-      document.removeEventListener('pointermove', onPointerMove);
-      document.removeEventListener('pointerup', onPointerUp);
-      document.removeEventListener('pointercancel', onPointerUp);
+      
+      // Recalibrate arrasto se um dedo for solto e sobrar outro
+      if (pointersRef.current.size === 1) {
+          const remainingPtr = Array.from(pointersRef.current.values())[0];
+          dragStartRef.current = {
+              startX: remainingPtr.x,
+              startY: remainingPtr.y,
+              startObjX: propsRef.current.x,
+              startObjY: propsRef.current.y
+          };
+      }
+
+      if (pointersRef.current.size === 0) {
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+        document.removeEventListener('pointercancel', onPointerUp);
+      }
     };
 
-    document.addEventListener('pointermove', onPointerMove);
-    document.addEventListener('pointerup', onPointerUp);
-    document.addEventListener('pointercancel', onPointerUp);
+    if (pointersRef.current.size === 1) {
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+        document.addEventListener('pointercancel', onPointerUp);
+    }
   };
 
   const handleResizePointerDown = (e, corner) => {
