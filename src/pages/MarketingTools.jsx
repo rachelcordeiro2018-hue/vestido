@@ -221,7 +221,7 @@ const MarketingTools = () => {
                     <>
                       <CanvasElement
                         isImageWrapper
-                        className="flex-1"
+                        style={{ width: '514px' }} // Explicit width instead of flex-1
                         mode="translate"
                         x={activeProduct.x1 || 0} y={activeProduct.y1 || 0} scale={activeProduct.scale1 || 1}
                         zoomFactor={containerWidth / 1028}
@@ -234,7 +234,7 @@ const MarketingTools = () => {
                       <div className="w-[12px] h-full bg-white z-20 shadow-[0_0_30px_rgba(0,0,0,0.3)] pointer-events-none" />
                       <CanvasElement
                         isImageWrapper
-                        className="flex-1"
+                        style={{ width: '514px' }} // Explicit width instead of flex-1
                         mode="translate"
                         x={activeProduct.x2 || 0} y={activeProduct.y2 || 0} scale={activeProduct.scale2 || 1}
                         zoomFactor={containerWidth / 1028}
@@ -248,7 +248,7 @@ const MarketingTools = () => {
                   ) : activeProduct.imagem1 || activeProduct.imagem2 ? (
                     <CanvasElement
                       isImageWrapper
-                      className="w-full h-full"
+                      style={{ width: '1028px', height: '1028px' }} // Explicit size
                       mode="translate"
                       x={activeProduct.x1 || 0} y={activeProduct.y1 || 0} scale={activeProduct.scale1 || 1}
                       zoomFactor={containerWidth / 1028}
