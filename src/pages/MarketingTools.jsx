@@ -151,32 +151,53 @@ const MarketingTools = () => {
     const originalSelectedLayer = selectedLayer;
     
     try {
-      // Oculta as almas de seleção durante o export
+      // 1. Remove qualquer seleção para limpar a imagem final de alças/bordas
       setSelectedLayer(null);
-      // Pequeno delay para garantir que o React renderizou sem os highlights
-      await new Promise(resolve => setTimeout(resolve, 350));
+      await new Promise(r => setTimeout(r, 400));
 
       const product = activeProduct;
       const ref = previewRefs.current[product.id];
       
       if (ref) {
-        // Opções focadas em estabilidade mobile
-        const options = {
-          quality: 0.95,
-          pixelRatio: 1.5, // Equilíbrio entre qualidade e performance
-          cacheBust: true,
-          style: { 
-            visibility: 'visible',
-            transform: 'none'
+        // 2. Tentar converter as imagens para DataURL via Proxy para burlar o CORS/Taint
+        // Isso é o que resolve o erro de "arte em branco" quando há fotos externas.
+        const convertToDataURL = async (url) => {
+          if (!url || typeof url !== 'string' || url.startsWith('data:') || url.startsWith('blob:')) return url;
+          try {
+            // Usando o proxy corsproxy.io que é público e estável
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+            const response = await fetch(proxyUrl);
+            const blob = await response.blob();
+            return new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result);
+              reader.readAsDataURL(blob);
+            });
+          } catch (e) {
+            console.warn("Proxy failed for", url, e);
+            return url;
           }
         };
 
-        // Captura direta com tratamento de erro
-        const dataUrl = await toPng(ref, options);
-        
-        if (!dataUrl || dataUrl === 'data:,') {
-          throw new Error("Generated image is empty");
+        const img1 = await convertToDataURL(product.imagem1);
+        const img2 = await convertToDataURL(product.imagem2);
+
+        // Aplicamos as imagens convertidas antes de tirar a "foto"
+        if (img1 !== product.imagem1 || img2 !== product.imagem2) {
+          updateProduct(product.id, 'imagem1', img1);
+          updateProduct(product.id, 'imagem2', img2);
+          await new Promise(r => setTimeout(r, 500)); // Tempo extra para o navegador carregar o Base64
         }
+
+        // 3. Captura com configurações de máxima compatibilidade mobile
+        const dataUrl = await toPng(ref, {
+          quality: 0.95,
+          pixelRatio: 1.2, // Um pouco acima de 1 para nitidez, mas sem estourar memória
+          cacheBust: true,
+          style: { transform: 'none' }
+        });
+
+        if (!dataUrl || dataUrl.length < 100) throw new Error("Image capture failed");
 
         const link = document.createElement('a');
         link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
@@ -184,10 +205,9 @@ const MarketingTools = () => {
         link.click();
       }
     } catch (err) {
-      console.error('Error exporting image:', err);
-      alert('Erro ao gerar exportação. Tente novamente clicando em Salvar Artes.');
+      console.error('Export Error:', err);
+      alert('Erro ao gerar imagem. Se estiver no iPhone, tente desativar o "Modo de Pouca Energia" ou recarregue a página.');
     } finally {
-      // Restaura a camada anterior e encerra o estado de carregamento
       setSelectedLayer(originalSelectedLayer);
       setIsExporting(false);
     }
