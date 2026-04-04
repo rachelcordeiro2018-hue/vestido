@@ -159,53 +159,119 @@ const MarketingTools = () => {
       const original = previewRefs.current[product.id];
       
       if (original) {
-        // --- MÉTODO CLONE & BLOB (O MAIS ROBUSTO DO MUNDO) ---
-        // 1. Criamos um clone limpo do elemento
-        const clone = original.cloneNode(true);
+        // --- MÉTODO MOTOR DE RENDERIZAÇÃO MANUAL (CANVAS) ---
+        // Única forma 100% garantida no iPhone/Android para artes complexas
+        const canvas = document.createElement('canvas');
+        canvas.width = 1028;
+        canvas.height = 1028;
+        const ctx = canvas.getContext('2d');
         
-        // 2. Colocamos o clone fora da tela, mas no corpo do documento (limpa heranças de escala)
-        clone.style.position = 'fixed';
-        clone.style.left = '-5000px'; 
-        clone.style.top = '0';
-        clone.style.transform = 'none';
-        clone.style.width = '1028px';
-        clone.style.height = '1028px';
-        clone.style.zIndex = '99999';
-        clone.style.visibility = 'visible';
-        
-        document.body.appendChild(clone);
-
-        try {
-          // Pequena pausa para o navegador reconhecer o novo elemento no DOM
-          await new Promise(r => setTimeout(r, 600));
-
-          // 3. Capturamos via Blob (Gasta muito menos memória que PNG/Base64 e não trava iPhone)
-          const blob = await toBlob(clone, {
-            quality: 0.95,
-            pixelRatio: 1, // Fixamos em 1 para garantir que o Chrome/Safari não explodam
-            cacheBust: true,
-            backgroundColor: '#ffffff'
-          });
-
-          if (!blob || blob.size < 1000) throw new Error("Blob failed");
-
-          // 4. Criamos o link de download a partir do Blob
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
-          link.href = url;
-          link.click();
+        // 1. Função auxiliar para carregar imagens com segurança
+        const loadImage = (url) => new Promise((resolve) => {
+          if (!url) return resolve(null);
+          const img = new Image();
+          img.crossOrigin = "anonymous";
           
-          // Limpeza do objeto URL
-          setTimeout(() => URL.revokeObjectURL(url), 1000);
-        } finally {
-          // Removemos o clone do documento
-          document.body.removeChild(clone);
+          // Só usamos proxy para URLs EXTERNAS (http/https que não sejam do domínio local)
+          const isExternal = url.startsWith('http') && !url.includes(window.location.host);
+          img.src = isExternal ? `https://corsproxy.io/?${encodeURIComponent(url)}` : url;
+          
+          img.onload = () => resolve(img);
+          img.onerror = () => {
+             console.warn("Failed to load image for canvas:", url);
+             resolve(null);
+          };
+        });
+
+        // Verificamos imagens para carregar
+        const [bgImg1, bgImg2, footerImg] = await Promise.all([
+          loadImage(product.imagem1),
+          loadImage(product.imagem2),
+          loadImage('/RODAPE.png')
+        ]);
+
+        // 2. Fundo (Background Color)
+        ctx.fillStyle = product.bgColor || '#ffffff';
+        ctx.fillRect(0, 0, 1028, 1028);
+
+        // 3. Desenha as fotos do produto (com clipping e escala)
+        const drawProductImage = (img, clipX, clipY, clipW, clipH, objX, objY, objScale) => {
+          if (!img) return;
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(clipX, clipY, clipW, clipH);
+          ctx.clip();
+          
+          // Lógica de escala centralizada no objeto
+          const scale = objScale || 1;
+          const drawW = clipW * scale;
+          const drawH = (img.height * (clipW / img.width)) * scale;
+          ctx.drawImage(img, clipX + objX, objY, drawW, drawH);
+          ctx.restore();
+        };
+
+        if (bgImg1 && bgImg2) {
+          drawProductImage(bgImg1, 0, 0, 514, 1028, product.x1 || 0, product.y1 || 0, product.scale1 || 1);
+          // Divisor central
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(514 - 6, 0, 12, 1028);
+          drawProductImage(bgImg2, 514, 0, 514, 1028, product.x2 || 0, product.y2 || 0, product.scale2 || 1);
+        } else if (bgImg1 || bgImg2) {
+          drawProductImage(bgImg1 || bgImg2, 0, 0, 1028, 1028, product.x1 || 0, product.y1 || 0, product.scale1 || 1);
         }
+
+        // 4. Rodapé
+        if (footerImg) {
+          const footerH = (footerImg.height * (1028 / footerImg.width));
+          ctx.drawImage(footerImg, 0, 1028 - footerH, 1028, footerH);
+        }
+
+        // 5. Desenho dos Textos (Preço e Nome)
+        const drawArtText = (text, x, y, size, color, scale, isPrice = false) => {
+           if (!text) return;
+           ctx.save();
+           // Ajuste de base para o bottom do canvas
+           ctx.translate(x, 1028 - 230 - y);
+           ctx.scale(scale, scale);
+           
+           ctx.font = `italic 900 ${size}px "Archivo Black", sans-serif`;
+           ctx.textAlign = 'left';
+           ctx.textBaseline = 'bottom';
+           
+           // Stroke Branco (simulando a borda do UI)
+           ctx.strokeStyle = 'white';
+           ctx.lineWidth = isPrice ? 12 : 16;
+           ctx.lineJoin = 'round';
+           ctx.strokeText(text, 0, 0);
+           
+           // Shadow
+           ctx.shadowColor = 'rgba(0,0,0,0.5)';
+           ctx.shadowBlur = 20;
+           ctx.shadowOffsetX = 4;
+           ctx.shadowOffsetY = 4;
+           
+           ctx.fillStyle = color || '#ffffff';
+           ctx.fillText(text, 0, 0);
+           ctx.restore();
+        };
+
+        // Nome (embaixo do preço ou ao lado)
+        drawArtText(product.nome?.toUpperCase(), 48 + (product.nameX || 0), (product.nameY || 0), 64, product.nameColor, product.nameScale || 1);
+        
+        // Preço (R$ separado do valor)
+        const priceStr = `R$ ${product.preco}`;
+        drawArtText(priceStr, 48 + (product.priceX || 0), (product.priceY || 0), 86, product.priceColor, product.priceScale || 1, true);
+
+        // 6. Exportação final
+        const dataUrl = canvas.toDataURL('image/png', 1.0);
+        const link = document.createElement('a');
+        link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
+        link.href = dataUrl;
+        link.click();
       }
     } catch (err) {
-      console.error('Ultimate Export Error:', err);
-      alert('Erro ao gerar imagem. Tente fechar outras abas do navegador ou reinicie o celular.');
+      console.error('Canvas Renderer Error:', err);
+      alert('Erro ao gerar exportação manual. Tente novamente.');
     } finally {
       setSelectedLayer(originalSelectedLayer);
       setIsExporting(false);
