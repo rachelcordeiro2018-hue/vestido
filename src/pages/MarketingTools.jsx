@@ -131,28 +131,48 @@ const MarketingTools = () => {
 
   const downloadImageArray = async () => {
     setIsExporting(true);
+    const originalSelectedLayer = selectedLayer;
+    
     try {
-      for (const product of products) {
-        const ref = previewRefs.current[product.id];
-        if (ref) {
-          const dataUrl = await toPng(ref, { 
-            quality: 1,
-            canvasWidth: 1028,
-            canvasHeight: 1028,
-            width: 1028,
-            height: 1028,
-            pixelRatio: 1,
-            style: { transform: 'none', transformOrigin: 'top left', left: '0', top: '0' }
-          });
-          const link = document.createElement('a');
-          link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
-          link.href = dataUrl;
-          link.click();
-        }
+      // Oculta as almas de seleção e handles durante o export
+      setSelectedLayer(null);
+      // Pequeno delay para garantir que o React renderizou sem os highlights
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      const product = activeProduct;
+      const ref = previewRefs.current[product.id];
+      
+      if (ref) {
+        // Opções robustas para html-to-image
+        const options = {
+          quality: 1,
+          canvasWidth: 1028,
+          canvasHeight: 1028,
+          width: 1028,
+          height: 1028,
+          pixelRatio: 2, // Melhor qualidade em export
+          cacheBust: true,
+          style: { 
+            transform: 'none', 
+            transformOrigin: 'top left', 
+            left: '0', 
+            top: '0',
+            visibility: 'visible'
+          }
+        };
+
+        const dataUrl = await toPng(ref, options);
+        const link = document.createElement('a');
+        link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
+        link.href = dataUrl;
+        link.click();
       }
     } catch (err) {
-      console.error('Error exporting images:', err);
+      console.error('Error exporting image:', err);
+      alert('Erro ao gerar a imagem. Tente novamente.');
     } finally {
+      // Restaura a seleção original
+      setSelectedLayer(originalSelectedLayer);
       setIsExporting(false);
     }
   };
@@ -180,7 +200,7 @@ const MarketingTools = () => {
                         onSelect={() => setSelectedLayer('imagem1')}
                         onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x1', nx); updateProduct(activeProduct.id, 'y1', ny); updateProduct(activeProduct.id, 'scale1', ns); }}
                       >
-                        <img src={activeProduct.imagem1} className="absolute inset-0 w-full h-full object-cover" />
+                        <img crossOrigin="anonymous" src={activeProduct.imagem1} className="absolute inset-0 w-full h-full object-cover" />
                       </CanvasElement>
                       <div className="w-[12px] h-full bg-white z-20 shadow-[0_0_30px_rgba(0,0,0,0.3)] pointer-events-none" />
                       <CanvasElement
@@ -193,7 +213,7 @@ const MarketingTools = () => {
                         onSelect={() => setSelectedLayer('imagem2')}
                         onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x2', nx); updateProduct(activeProduct.id, 'y2', ny); updateProduct(activeProduct.id, 'scale2', ns); }}
                       >
-                        <img src={activeProduct.imagem2} className="absolute inset-0 w-full h-full object-cover" />
+                        <img crossOrigin="anonymous" src={activeProduct.imagem2} className="absolute inset-0 w-full h-full object-cover" />
                       </CanvasElement>
                     </>
                   ) : activeProduct.imagem1 || activeProduct.imagem2 ? (
@@ -207,7 +227,7 @@ const MarketingTools = () => {
                       onSelect={() => setSelectedLayer('imagem1')}
                       onUpdate={(nx, ny, ns) => { updateProduct(activeProduct.id, 'x1', nx); updateProduct(activeProduct.id, 'y1', ny); updateProduct(activeProduct.id, 'scale1', ns); }}
                     >
-                      <img src={activeProduct.imagem1 || activeProduct.imagem2} className="absolute inset-0 w-full h-full object-contain" />
+                      <img crossOrigin="anonymous" src={activeProduct.imagem1 || activeProduct.imagem2} className="absolute inset-0 w-full h-full object-contain" />
                     </CanvasElement>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-200">
