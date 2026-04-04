@@ -129,6 +129,23 @@ const MarketingTools = () => {
     }
   };
 
+  // Utility to convert remote URL to DataURL (Base64) to avoid CORS issues during export
+  const getSafeDataURL = async (url) => {
+    if (!url || url.startsWith('data:') || url.startsWith('blob:')) return url;
+    try {
+      const response = await fetch(url, { mode: 'cors' });
+      const blob = await response.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      console.warn('Failed to convert image to DataURL, falling back to original URL', e);
+      return url;
+    }
+  };
+
   const downloadImageArray = async () => {
     setIsExporting(true);
     const originalSelectedLayer = selectedLayer;
@@ -136,8 +153,20 @@ const MarketingTools = () => {
     try {
       // Oculta as almas de seleção e handles durante o export
       setSelectedLayer(null);
-      // Pequeno delay para garantir que o React renderizou sem os highlights
-      await new Promise(resolve => setTimeout(resolve, 150));
+      
+      // Sanitiza as imagens para DataURL antes do download para evitar Canvas Taint (CORS)
+      const safeImg1 = await getSafeDataURL(activeProduct.imagem1);
+      const safeImg2 = await getSafeDataURL(activeProduct.imagem2);
+      
+      // Temporariamente atualiza o produto para usar as imagens seguras
+      if (safeImg1 !== activeProduct.imagem1 || safeImg2 !== activeProduct.imagem2) {
+        updateProduct(activeProduct.id, 'imagem1', safeImg1);
+        updateProduct(activeProduct.id, 'imagem2', safeImg2);
+        // Espera o React processar a mudança de imagem
+        await new Promise(resolve => setTimeout(resolve, 300));
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 150));
+      }
 
       const product = activeProduct;
       const ref = previewRefs.current[product.id];
