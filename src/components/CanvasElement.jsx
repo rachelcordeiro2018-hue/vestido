@@ -39,106 +39,105 @@ const CanvasElement = ({
     return () => el.removeEventListener('wheel', handleNativeWheel);
   }, [isImageWrapper]);
 
-  const pointersRef = useRef(new Map());
-  const dragStartRef = useRef(null);
+  const draggingState = useRef({
+    pointers: new Map(),
+    type: 'none',
+    startX: 0,
+    startY: 0,
+    startObjX: 0,
+    startObjY: 0,
+    initialDist: 0,
+    initialScale: 1
+  });
 
   const handlePointerDown = (e) => {
-    // If clicking a resize handle, ignore drag
-    if (e.target?.closest?.('.resize-handle')) return;
+    if (e.target.closest('.resize-handle')) return;
     
     e.stopPropagation();
     onSelect();
 
-    // For touch devices, preventDefault stops scrolling while dragging
     if (e.pointerType === 'touch') {
       try { e.target.setPointerCapture(e.pointerId); } catch(err){}
     }
 
-    const { x: currentX, y: currentY, scale: currentScale } = propsRef.current;
-    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
-    if (pointersRef.current.size === 1) {
-        dragStartRef.current = {
-            startX: e.clientX,
-            startY: e.clientY,
-            startObjX: currentX,
-            startObjY: currentY
-        };
-    } 
-    else if (pointersRef.current.size === 2 && isImageWrapper) {
-        const ptrs = Array.from(pointersRef.current.values());
-        dragStartRef.current.initialPinchDist = Math.hypot(ptrs[0].x - ptrs[1].x, ptrs[0].y - ptrs[1].y);
-        dragStartRef.current.initialScale = currentScale;
-    }
-
-    const onPointerMove = (moveEvent) => {
-      if (!pointersRef.current.has(moveEvent.pointerId)) return;
-      pointersRef.current.set(moveEvent.pointerId, { x: moveEvent.clientX, y: moveEvent.clientY });
-
-      if (pointersRef.current.size === 2 && isImageWrapper) {
-         const ptrs = Array.from(pointersRef.current.values());
-         const dist = Math.hypot(ptrs[0].x - ptrs[1].x, ptrs[0].y - ptrs[1].y);
-         const scaleMultiplier = dist / dragStartRef.current.initialPinchDist;
-         const newScale = Math.max(0.1, dragStartRef.current.initialScale * scaleMultiplier);
-         propsRef.current.onUpdate(propsRef.current.x, propsRef.current.y, newScale);
-      } 
-      else if (pointersRef.current.size === 1) {
-         const dx = (moveEvent.clientX - dragStartRef.current.startX) / zoomFactor;
-         const dy = (moveEvent.clientY - dragStartRef.current.startY) / zoomFactor;
-         const { scale } = propsRef.current;
-         
-         if (mode === 'translate') {
-           const visualDx = dx / scale;
-           const visualDy = dy / scale;
-           propsRef.current.onUpdate(
-               dragStartRef.current.startObjX + visualDx, 
-               dragStartRef.current.startObjY + visualDy, 
-               scale
-           );
-         } else {
-           propsRef.current.onUpdate(
-               dragStartRef.current.startObjX + dx, 
-               dragStartRef.current.startObjY + dy, 
-               scale
-           );
-         }
-      }
-    };
-
-    const onPointerUp = (upEvent) => {
-      if (upEvent && upEvent.pointerId) {
-        pointersRef.current.delete(upEvent.pointerId);
-        try { upEvent.target.releasePointerCapture(upEvent.pointerId); } catch(err){}
-      }
+    draggingState.current.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    
+    if (draggingState.current.pointers.size === 1) {
+      draggingState.current.type = 'translate';
+      draggingState.current.startX = e.clientX;
+      draggingState.current.startY = e.clientY;
+      draggingState.current.startObjX = x;
+      draggingState.current.startObjY = y;
       
-      // Recalibrate arrasto se um dedo for solto e sobrar outro
-      if (pointersRef.current.size === 1) {
-          const remainingPtr = Array.from(pointersRef.current.values())[0];
-          dragStartRef.current = {
-              startX: remainingPtr.x,
-              startY: remainingPtr.y,
-              startObjX: propsRef.current.x,
-              startObjY: propsRef.current.y
-          };
-      }
+      const onPointerMove = (moveEvent) => {
+        const state = draggingState.current;
+        state.pointers.set(moveEvent.pointerId, { x: moveEvent.clientX, y: moveEvent.clientY });
 
-      if (pointersRef.current.size === 0) {
-        document.removeEventListener('pointermove', onPointerMove);
-        document.removeEventListener('pointerup', onPointerUp);
-        document.removeEventListener('pointercancel', onPointerUp);
-      }
-    };
+        if (state.pointers.size === 1 && state.type === 'translate') {
+          const dx = (moveEvent.clientX - state.startX) / zoomFactor;
+          const dy = (moveEvent.clientY - state.startY) / zoomFactor;
+          
+          if (mode === 'translate') {
+            const visualDx = dx / scale;
+            const visualDy = dy / scale;
+            onUpdate(state.startObjX + visualDx, state.startObjY + visualDy, scale);
+          } else {
+            onUpdate(state.startObjX + dx, state.startObjY + dy, scale);
+          }
+        } else if (state.pointers.size === 2) {
+          const ids = Array.from(state.pointers.keys());
+          const p1 = state.pointers.get(ids[0]);
+          const p2 = state.pointers.get(ids[1]);
+          const currentDist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
 
-    if (pointersRef.current.size === 1) {
-        document.addEventListener('pointermove', onPointerMove);
-        document.addEventListener('pointerup', onPointerUp);
-        document.addEventListener('pointercancel', onPointerUp);
+          if (state.type !== 'pinch') {
+            state.type = 'pinch';
+            state.initialDist = currentDist;
+            state.initialScale = propsRef.current.scale;
+          } else {
+            const scaleChange = currentDist / state.initialDist;
+            const newScale = Math.max(0.1, state.initialScale * scaleChange);
+            onUpdate(propsRef.current.x, propsRef.current.y, newScale);
+          }
+        }
+      };
+
+      const onPointerUp = (upEvent) => {
+        const state = draggingState.current;
+        state.pointers.delete(upEvent.pointerId);
+
+        if (upEvent && upEvent.pointerId && upEvent.pointerType === 'touch') {
+          try { upEvent.target.releasePointerCapture(upEvent.pointerId); } catch(err){}
+        }
+
+        if (state.pointers.size === 0) {
+          state.type = 'none';
+          document.removeEventListener('pointermove', onPointerMove);
+          document.removeEventListener('pointerup', onPointerUp);
+          document.removeEventListener('pointercancel', onPointerUp);
+        } else if (state.pointers.size === 1) {
+          // If we went from 2 to 1 finger, reset translation start point to avoid jumping
+          state.type = 'translate';
+          const remainingId = Array.from(state.pointers.keys())[0];
+          const p = state.pointers.get(remainingId);
+          state.startX = p.x;
+          state.startY = p.y;
+          state.startObjX = propsRef.current.x;
+          state.startObjY = propsRef.current.y;
+        }
+      };
+
+      document.addEventListener('pointermove', onPointerMove);
+      document.addEventListener('pointerup', onPointerUp);
+      document.addEventListener('pointercancel', onPointerUp);
+    } else if (draggingState.current.pointers.size === 2) {
+      // Second finger added - pinch logic initialized in onPointerMove
     }
   };
 
   const handleResizePointerDown = (e, corner) => {
     e.stopPropagation();
-    e.preventDefault(); // prevent native behavior
+    e.preventDefault();
     onSelect();
 
     if (e.pointerType === 'touch') {
@@ -149,15 +148,13 @@ const CanvasElement = ({
     const startScale = scale;
 
     const onPointerMove = (moveEvent) => {
-      // Move up (negative delta) means scale UP 
-      // Move down (positive delta) means scale DOWN
       const dy = (startY - moveEvent.clientY) / zoomFactor;
       const newScale = Math.max(0.1, startScale + (dy * 0.005));
       onUpdate(x, y, newScale);
     };
 
     const onPointerUp = (upEvent) => {
-      if (upEvent && upEvent.pointerId) {
+      if (upEvent && upEvent.pointerId && upEvent.pointerType === 'touch') {
         try { upEvent.target.releasePointerCapture(upEvent.pointerId); } catch(err){}
       }
       document.removeEventListener('pointermove', onPointerMove);
