@@ -21,7 +21,7 @@ import {
   X,
   Brush
 } from 'lucide-react';
-import { toPng } from 'html-to-image';
+import { toPng, toBlob } from 'html-to-image';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
 import CanvasElement from '../components/CanvasElement';
@@ -156,69 +156,62 @@ const MarketingTools = () => {
       await new Promise(r => setTimeout(r, 400));
 
       const product = activeProduct;
-      const ref = previewRefs.current[product.id];
-      const parentScaler = ref?.parentElement;
+      const original = previewRefs.current[product.id];
       
-      if (ref && parentScaler) {
-        // 2. Tentar converter as imagens para DataURL via Proxy para burlar o CORS/Taint
-        const convertToDataURL = async (url) => {
-          if (!url || typeof url !== 'string' || url.startsWith('data:') || url.startsWith('blob:')) return url;
-          try {
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-            const response = await fetch(proxyUrl);
-            const blob = await response.blob();
-            return new Promise((resolve) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result);
-              reader.readAsDataURL(blob);
-            });
-          } catch (e) {
-            return url;
-          }
-        };
-
-        const img1 = await convertToDataURL(product.imagem1);
-        const img2 = await convertToDataURL(product.imagem2);
-
-        // Aplicamos as imagens convertidas antes de tirar a "foto"
-        if (img1 !== product.imagem1 || img2 !== product.imagem2) {
-          updateProduct(product.id, 'imagem1', img1);
-          updateProduct(product.id, 'imagem2', img2);
-          await new Promise(r => setTimeout(r, 600)); 
-        }
-
-        // --- HACK DEFINITIVO PARA SAFARI/IPHONE ---
-        // O Safari falha ao capturar elementos que estão dentro de um pai com "transform: scale"
-        // Vamos remover o zoom visual do pai temporariamente durante o clique
-        const originalTransform = parentScaler.style.transform;
-        parentScaler.style.transform = 'none';
+      if (original) {
+        // --- MÉTODO CLONE & BLOB (O MAIS ROBUSTO DO MUNDO) ---
+        // 1. Criamos um clone limpo do elemento
+        const clone = original.cloneNode(true);
         
+        // 2. Colocamos o clone fora da tela, mas no corpo do documento (limpa heranças de escala)
+        clone.style.position = 'fixed';
+        clone.style.left = '-5000px'; 
+        clone.style.top = '0';
+        clone.style.transform = 'none';
+        clone.style.width = '1028px';
+        clone.style.height = '1028px';
+        clone.style.zIndex = '99999';
+        clone.style.visibility = 'visible';
+        
+        document.body.appendChild(clone);
+
         try {
-          const dataUrl = await toPng(ref, {
+          // Pequena pausa para o navegador reconhecer o novo elemento no DOM
+          await new Promise(r => setTimeout(r, 600));
+
+          // 3. Capturamos via Blob (Gasta muito menos memória que PNG/Base64 e não trava iPhone)
+          const blob = await toBlob(clone, {
             quality: 0.95,
-            pixelRatio: 1, // Reduzindo para 1 para evitar crash de memória no iOS
-            cacheBust: true
+            pixelRatio: 1, // Fixamos em 1 para garantir que o Chrome/Safari não explodam
+            cacheBust: true,
+            backgroundColor: '#ffffff'
           });
 
-          if (!dataUrl || dataUrl.length < 500) throw new Error("Capture empty");
+          if (!blob || blob.size < 1000) throw new Error("Blob failed");
 
+          // 4. Criamos o link de download a partir do Blob
+          const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
-          link.href = dataUrl;
+          link.href = url;
           link.click();
+          
+          // Limpeza do objeto URL
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
         } finally {
-          // Restaura o zoom original na tela do usuário
-          parentScaler.style.transform = originalTransform;
+          // Removemos o clone do documento
+          document.body.removeChild(clone);
         }
       }
     } catch (err) {
-      console.error('Export Error:', err);
-      alert('Erro ao gerar imagem. Se estiver no iPhone, tente desativar o "Modo de Pouca Energia" ou recarregue a página.');
+      console.error('Ultimate Export Error:', err);
+      alert('Erro ao gerar imagem. Tente fechar outras abas do navegador ou reinicie o celular.');
     } finally {
       setSelectedLayer(originalSelectedLayer);
       setIsExporting(false);
     }
   };
+
 
   const activeProduct = products.find(p => p.id === selectedId) || products[0];
 
