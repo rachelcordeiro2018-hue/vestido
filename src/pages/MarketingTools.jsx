@@ -151,46 +151,33 @@ const MarketingTools = () => {
     const originalSelectedLayer = selectedLayer;
     
     try {
-      // Oculta as almas de seleção e handles durante o export
+      // Oculta as almas de seleção durante o export
       setSelectedLayer(null);
-      
-      // Sanitiza as imagens para DataURL antes do download para evitar Canvas Taint (CORS)
-      const safeImg1 = await getSafeDataURL(activeProduct.imagem1);
-      const safeImg2 = await getSafeDataURL(activeProduct.imagem2);
-      
-      // Temporariamente atualiza o produto para usar as imagens seguras
-      if (safeImg1 !== activeProduct.imagem1 || safeImg2 !== activeProduct.imagem2) {
-        updateProduct(activeProduct.id, 'imagem1', safeImg1);
-        updateProduct(activeProduct.id, 'imagem2', safeImg2);
-        // Espera o React processar a mudança de imagem
-        await new Promise(resolve => setTimeout(resolve, 300));
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 150));
-      }
+      // Pequeno delay para garantir que o React renderizou sem os highlights
+      await new Promise(resolve => setTimeout(resolve, 350));
 
       const product = activeProduct;
       const ref = previewRefs.current[product.id];
       
       if (ref) {
+        // Opções focadas em estabilidade mobile
         const options = {
-          quality: 1,
-          pixelRatio: 2,
+          quality: 0.95,
+          pixelRatio: 1.5, // Equilíbrio entre qualidade e performance
           cacheBust: true,
           style: { 
-            // Garante que o elemento clonado esteja em uma posição segura e visível
             visibility: 'visible',
             transform: 'none'
           }
         };
 
-        // HACK PARA MOBILE/SAFARI: Chamamos a função duas vezes.
-        // A primeira "aquece" o cache e carrega fontes/imagens no motor de renderização.
-        // A segunda efetivamente gera o PNG correto.
-        await toPng(ref, options);
-        await new Promise(r => setTimeout(r, 100)); // Pequena pausa entre chamadas
-
+        // Captura direta com tratamento de erro
         const dataUrl = await toPng(ref, options);
         
+        if (!dataUrl || dataUrl === 'data:,') {
+          throw new Error("Generated image is empty");
+        }
+
         const link = document.createElement('a');
         link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
         link.href = dataUrl;
@@ -198,9 +185,9 @@ const MarketingTools = () => {
       }
     } catch (err) {
       console.error('Error exporting image:', err);
-      alert('Erro ao gerar a imagem. Tente novamente.');
+      alert('Erro ao gerar exportação. Tente novamente clicando em Salvar Artes.');
     } finally {
-      // Restaura a seleção original
+      // Restaura a camada anterior e encerra o estado de carregamento
       setSelectedLayer(originalSelectedLayer);
       setIsExporting(false);
     }
