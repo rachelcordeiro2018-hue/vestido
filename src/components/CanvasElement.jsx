@@ -16,8 +16,8 @@ const CanvasElement = ({
   const containerRef = useRef(null);
   
   // Track latest props for native event listeners without re-binding
-  const propsRef = useRef({ x, y, scale, onUpdate, isSelected, zoomFactor, mode });
-  propsRef.current = { x, y, scale, onUpdate, isSelected, zoomFactor, mode };
+  const propsRef = useRef({ x, y, scale, onUpdate, isSelected });
+  propsRef.current = { x, y, scale, onUpdate, isSelected };
 
   // Native wheel event with passive: false to prevent page scrolling!
   useEffect(() => {
@@ -39,12 +39,6 @@ const CanvasElement = ({
     return () => el.removeEventListener('wheel', handleNativeWheel);
   }, [isImageWrapper]);
 
-  // State for multi-touch (pinch-zoom and stable drag)
-  const pointersRef = useRef(new Map());
-  const initialDistRef = useRef(0);
-  const initialScaleRef = useRef(1);
-  const dragStartRef = useRef({ x: 0, y: 0, objX: 0, objY: 0 });
-
   const handlePointerDown = (e) => {
     // If clicking a resize handle, ignore drag
     if (e.target.closest('.resize-handle')) return;
@@ -52,86 +46,48 @@ const CanvasElement = ({
     e.stopPropagation();
     onSelect();
 
+    // prevent default so it doesn't cause weird drag/drop of images natively in some browsers
+    // Note: preventDefault on pointerdown blocks click. If we need click, we just let it be.
+    // e.preventDefault(); 
+    
+    // For touch devices, preventDefault stops scrolling while dragging
     if (e.pointerType === 'touch') {
       try { e.target.setPointerCapture(e.pointerId); } catch(err){}
     }
 
-    // Keep track of all active pointers
-    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startObjX = x;
+    const startObjY = y;
 
-    // If it's the first pointer, initialize dragging and add document listeners
-    if (pointersRef.current.size === 1) {
-      dragStartRef.current = { 
-        x: e.clientX, 
-        y: e.clientY, 
-        objX: propsRef.current.x, 
-        objY: propsRef.current.y 
-      };
+    const onPointerMove = (moveEvent) => {
+      // Use movement delta scaled by zoom
+      const dx = (moveEvent.clientX - startX) / zoomFactor;
+      const dy = (moveEvent.clientY - startY) / zoomFactor;
+      
+      if (mode === 'translate') {
+        const visualDx = dx / scale;
+        const visualDy = dy / scale;
+        onUpdate(startObjX + visualDx, startObjY + visualDy, scale);
+      } else {
+        // Absolute text uses "bottom" instead of "top" in MarketingTools 
+        // bottom: 230 - nameY => so dy needs to be added, not subtracted, to move in the physical mouse direction
+        onUpdate(startObjX + dx, startObjY + dy, scale);
+      }
+    };
 
-      const onPointerMove = (moveEvent) => {
-        // Always update the stored position for this pointer
-        pointersRef.current.set(moveEvent.pointerId, { x: moveEvent.clientX, y: moveEvent.clientY });
-        
-        const { onUpdate, scale, mode, zoomFactor } = propsRef.current;
-        const pts = Array.from(pointersRef.current.values());
+    const onPointerUp = (upEvent) => {
+      if (upEvent && upEvent.pointerId) {
+        try { upEvent.target.releasePointerCapture(upEvent.pointerId); } catch(err){}
+      }
+      document.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerup', onPointerUp);
+      document.removeEventListener('pointercancel', onPointerUp);
+    };
 
-        // PINCH ZOOM logic (if 2 pointers are active)
-        if (pointersRef.current.size === 2 && isImageWrapper) {
-          const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-          if (initialDistRef.current > 0) {
-            const ratio = dist / initialDistRef.current;
-            // Apply scale relative to the start of the pinch gesture
-            const newScale = Math.max(0.1, Math.min(5, initialScaleRef.current * ratio));
-            onUpdate(propsRef.current.x, propsRef.current.y, newScale);
-          }
-        } 
-        // SINGLE DRAG logic (if 1 pointer is active)
-        else if (pointersRef.current.size === 1) {
-          const ds = dragStartRef.current;
-          const dx = (moveEvent.clientX - ds.x) / zoomFactor;
-          const dy = (moveEvent.clientY - ds.y) / zoomFactor;
-          
-          if (mode === 'translate') {
-            const visualDx = dx / scale;
-            const visualDy = dy / scale;
-            onUpdate(ds.objX + visualDx, ds.objY + visualDy, scale);
-          } else {
-            onUpdate(ds.objX + dx, ds.objY + dy, scale);
-          }
-        }
-      };
-
-      const onPointerUp = (upEvent) => {
-        pointersRef.current.delete(upEvent.pointerId);
-
-        if (pointersRef.current.size === 0) {
-          document.removeEventListener('pointermove', onPointerMove);
-          document.removeEventListener('pointerup', onPointerUp);
-          document.removeEventListener('pointercancel', onPointerUp);
-        } else if (pointersRef.current.size === 1) {
-          // If one finger remains, reset the drag starting point to its current position
-          // to avoid a "jump" back to the original start point from before the pinch/multi-touch.
-          const remaining = pointersRef.current.values().next().value;
-          dragStartRef.current = { 
-            x: remaining.x, 
-            y: remaining.y, 
-            objX: propsRef.current.x, 
-            objY: propsRef.current.y 
-          };
-        }
-      };
-
-      document.addEventListener('pointermove', onPointerMove);
-      document.addEventListener('pointerup', onPointerUp);
-      document.addEventListener('pointercancel', onPointerUp);
-    }
-
-    // If we just added a second pointer, initialize pinch zoom variables
-    if (pointersRef.current.size === 2) {
-      const pts = Array.from(pointersRef.current.values());
-      initialDistRef.current = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      initialScaleRef.current = propsRef.current.scale;
-    }
+    document.addEventListener('pointermove', onPointerMove);
+    document.addEventListener('pointerup', onPointerUp);
+    document.addEventListener('pointercancel', onPointerUp);
   };
 
   const handleResizePointerDown = (e, corner) => {
