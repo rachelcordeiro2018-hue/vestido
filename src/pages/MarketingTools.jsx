@@ -143,25 +143,25 @@ const MarketingTools = () => {
       const ref = previewRefs.current[product.id];
       
       if (ref) {
-        // Opções robustas para html-to-image
         const options = {
           quality: 1,
-          canvasWidth: 1028,
-          canvasHeight: 1028,
-          width: 1028,
-          height: 1028,
-          pixelRatio: 2, // Melhor qualidade em export
+          pixelRatio: 2,
           cacheBust: true,
           style: { 
-            transform: 'none', 
-            transformOrigin: 'top left', 
-            left: '0', 
-            top: '0',
-            visibility: 'visible'
+            // Garante que o elemento clonado esteja em uma posição segura e visível
+            visibility: 'visible',
+            transform: 'none'
           }
         };
 
+        // HACK PARA MOBILE/SAFARI: Chamamos a função duas vezes.
+        // A primeira "aquece" o cache e carrega fontes/imagens no motor de renderização.
+        // A segunda efetivamente gera o PNG correto.
+        await toPng(ref, options);
+        await new Promise(r => setTimeout(r, 100)); // Pequena pausa entre chamadas
+
         const dataUrl = await toPng(ref, options);
+        
         const link = document.createElement('a');
         link.download = `art-${product.nome || 'vestido'}-${product.id}.png`;
         link.href = dataUrl;
