@@ -418,16 +418,16 @@ const RentalList = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden relative"
+              className="bg-white w-full max-w-2xl max-h-[90vh] flex flex-col rounded-[2.5rem] shadow-2xl relative overflow-hidden"
             >
               <button 
                 onClick={() => setSelectedRental(null)}
-                className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors z-10"
+                className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-md text-slate-600 shadow-sm hover:bg-slate-100 transition-colors z-20"
               >
                 <X className="w-6 h-6" />
               </button>
 
-              <div className="flex flex-col md:flex-row">
+              <div className="flex flex-col md:flex-row overflow-y-auto flex-1 w-full">
                 {/* Imagem */}
                 <div className="w-full md:w-1/2 h-64 md:h-auto bg-slate-50">
                   <img 
