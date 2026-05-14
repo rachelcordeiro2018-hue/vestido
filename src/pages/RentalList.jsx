@@ -177,7 +177,7 @@ const RentalList = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-slate-50">
@@ -298,6 +298,112 @@ const RentalList = () => {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile View */}
+        <div className="lg:hidden flex flex-col gap-4">
+          {currentLocacoes.map((loc, idx) => (
+            <motion.div
+              key={loc.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.05 }}
+              className="bg-white border border-slate-100 p-4 rounded-2xl shadow-sm flex flex-col gap-4 relative overflow-hidden"
+              onClick={() => setSelectedRental(loc)}
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <img 
+                      src={loc.foto_url || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=100&h=100&fit=crop'} 
+                      className="w-12 h-12 rounded-xl object-cover border border-slate-100"
+                      alt={loc.nome}
+                    />
+                    {activeTab === 'ativas' && isCritical(loc.data_locacao) && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full ring-2 ring-white animate-pulse" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-800 text-sm">{loc.nome}</p>
+                    <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
+                      <Phone className="w-3 h-3" />
+                      {loc.celular}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-red-700">{formatCurrency(loc.valor)}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-slate-50">
+                <div className="flex flex-col">
+                  <p className={cn(
+                    "text-sm font-medium", 
+                    activeTab === 'ativas' && isCritical(loc.data_locacao) ? "text-red-500" : "text-slate-700"
+                  )}>
+                    {format(parseISO(loc.data_locacao), "dd 'de' MMMM", { locale: ptBR })}
+                  </p>
+                  <p className={cn(
+                    "text-xs lowercase", 
+                    activeTab === 'ativas' && isCritical(loc.data_locacao) ? "text-red-400" : "text-slate-400"
+                  )}>
+                    {format(parseISO(loc.data_locacao), "EEEE", { locale: ptBR })}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedRental(loc);
+                    }}
+                    className="p-2 rounded-lg text-slate-400 hover:text-red-700 hover:bg-amber-50 transition-all bg-slate-50"
+                    title="Ver Detalhes"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/editar-locacao/${loc.id}`);
+                    }}
+                    className="p-2 rounded-lg text-slate-400 hover:text-red-700 hover:bg-amber-50 transition-all bg-slate-50"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(loc.id);
+                    }}
+                    disabled={deletingId === loc.id}
+                    className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all bg-slate-50"
+                  >
+                    {deletingId === loc.id ? (
+                      <RefreshCcw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+
+          {currentLocacoes.length === 0 && (
+            <div className="animate-in fade-in duration-300 py-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <AlertCircle className="w-6 h-6 text-slate-300" />
+              </div>
+              <p className="text-slate-400 font-medium text-sm">
+                {activeTab === 'ativas' ? 'Nenhuma locação em aberto' : 'Nenhuma locação finalizada'}
+              </p>
+              <p className="text-slate-300 text-xs mt-1">
+                {searchQuery ? 'Tente mudar sua busca.' : 'Seus registros aparecerão aqui.'}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
